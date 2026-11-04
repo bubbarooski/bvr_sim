@@ -1565,7 +1565,7 @@ mid-flight start with the turn already done.
 
 ## 6.10 Loft
 
-<!-- SCREENSHOT loft-profile.png: 1_core_04_loft seen from the side, the missile's climb, push-over and descent onto the target, with the trail visible and the loft apex in frame. -->
+![Side view of a lofted shot: climb, push-over and descent onto the target](images/loft-profile.png)
 
 On a long shot the missile climbs into thinner air, where drag is lower,
 and comes down onto the target, arriving faster and reaching farther than
@@ -2175,7 +2175,7 @@ jitter on top of a steady target.
 
 ## 9.3 Pulse-Doppler clutter notch
 
-<!-- SCREENSHOT notch-beam.png: 1_core_08_notch (or 2_combined_02_lookdown_beam) with the target beaming the radar, showing the radar cone touching the ground and the track dropped in the event log. -->
+![A target beaming the radar: the cone touching the ground and the track dropped](images/notch-beam.png)
 
 A pulse-Doppler radar cannot distinguish a target whose Doppler shift
 falls inside the main-lobe ground-clutter return from the clutter itself.
@@ -2678,7 +2678,7 @@ freezing at whatever it last reported.
 
 ## 10.4 Missile warning
 
-<!-- SCREENSHOT rwr-warnings.png: 1_core_05_stt_vs_tws with the target selected and its Entity Inspector showing the RWR state (perceived emitter mode, illuminated), next to the matching RWR_LOCK / RWR_MISSILE lines in the Event Log. -->
+![The target's Entity Inspector showing its RWR state, beside the event log](images/rwr-warnings.png)
 
 Separately from the radars, the RWR warns when a **missile's own seeker
 is transmitting at this aircraft** (`RWR_MISSILE` / `RWR_MISSILE_CLEAR`
@@ -3106,7 +3106,7 @@ shots end at 120 s still holding 3.1–3.5 G.
 
 ## 12.8 Launch zone
 
-<!-- SCREENSHOT launch-zone.png: 1_core_03_launch_zone at the moment of LAUNCH_ZONE_ENTERED, with the Event Log line showing rmax_ft and the Telemetry section open. -->
+![The launch-zone event in the Event Log with the Telemetry section open](images/launch-zone.png)
 
 **What Rmax is.** The farthest launch range at which the missile reaches
 a target that does not maneuver (Dantas et al., arXiv:2111.04474 [[Dantas 2021]](SOURCES.md#dantas-2021) [S]; the

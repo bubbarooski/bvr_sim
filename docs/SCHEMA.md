@@ -72,7 +72,7 @@ loading a scenario without the engagement or the loop.
 
 ## Teaching knobs
 
-<!-- SCREENSHOT parameter-editor.png: the sidebar's Parameters section with Advanced mode on (Settings gear), showing the editable teaching knobs and a type's read-only values. -->
+![The Parameters section with Advanced mode on](images/parameter-editor.png)
 
 A scenario sets **only** the teaching knobs below (plus each entity's
 placement and the structural fields: types, names, initial flight

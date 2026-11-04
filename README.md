@@ -10,7 +10,7 @@ datalink, radar detection and tracking, and a radar warning receiver, all
 spawned from JSON scenario files, watched live in a 3D viewer, and run by
 the thousand headlessly.
 
-<!-- SCREENSHOT hero.png: the 3D view mid-engagement (both aircraft, radar cones, the missile and its trail), full window with the sidebar open. -->
+![intercept_sim mid-engagement: aircraft, radar cones, and a missile with its trail](docs/images/hero.png)
 
 ## What it is for
 
@@ -44,7 +44,7 @@ result, then change one setting and see how that probability moves. A
 6-core desktop, and gives bit-identical results at any thread count
 ([Monte Carlo](#running-a-batch-monte-carlo)).
 
-<!-- SCREENSHOT mc-sweep.png: terminal after `python experiments/_template.py`, showing the kill-radius vs Pk table. -->
+![Terminal output of a kill-radius sweep: kill probability at each level](docs/images/mc-sweep.png)
 
 **What it isn't.** Not a validated model of any real aircraft, missile or
 radar: their real performance is not public, and the published figures
@@ -153,7 +153,7 @@ The sim starts paused. Controls:
 | Double-click empty space | Stop following the selected entity |
 | **Ctrl+Z** | Remove the last waypoint (waypoint placement mode) |
 
-<!-- SCREENSHOT gui-overview.png: the full window mid-run, with the 3D view, the bottom control panel, and the sidebar showing the Scenario section (its description) and the Parameters, Telemetry and Event Log sections expanded (they start collapsed). -->
+![The viewer: 3D scene, control panel, and the sidebar's Scenario, Parameters, Telemetry and Event Log](docs/images/gui-overview.png)
 
 The bottom panel holds pause, time scale, speed presets, Reset and
 Reload. The sidebar holds the scenario (its File popup has **New
@@ -165,7 +165,7 @@ which adds the finer knobs and each type's own values). While paused,
 selected aircraft, drag a waypoint vertically to change its altitude, and
 right-click one to delete it and every point after it.
 
-<!-- SCREENSHOT waypoint-mode.png: Waypoint Placement Mode on a showcase scenario, with a route of several waypoints drawn for the selected aircraft. -->
+![Waypoint Placement Mode with a route drawn for the selected aircraft](docs/images/waypoint-mode.png)
 
 Scenarios live under `scenarios/`, numbered so the GUI's File list reads
 as a short course. Each one says what it teaches and what to watch, and
@@ -183,7 +183,7 @@ most name a setting to try, at the top of the sidebar's Scenario section:
   combat air patrol, a climb to meet a high threat, and a free-flowing
   engagement.
 
-<!-- SCREENSHOT scenario-teaching-text.png: the sidebar's Scenario section for one core scenario (for example 1_core_05_stt_vs_tws), showing the description and the setting it suggests trying, with the Event Log section open below it showing an RWR_LOCK or SEEKER_ACTIVE line. -->
+![A core scenario's description in the sidebar, beside the event log](docs/images/scenario-teaching-text.png)
 
 `custom/` is for your own: `scenarios/custom/_template.json` is a starting
 point, and [docs/SCHEMA.md](docs/SCHEMA.md) documents every key.
