@@ -1,0 +1,29 @@
+{
+    "seed": 1,
+    "sim_speed": 1.0,
+    "missile_doctrine": {
+        "missile": "aim120",
+        "kill_radius_m": 12.0,
+        "max_range_m": 150000.0,
+        "nav_gain": 5.0
+    },
+    "entities": [
+        {
+            "name": "Pursuer",
+            "type": "aircraft",
+            "transform": { "pos": [-150000.0, 25000.0, 0.0], "heading": 90.0 },
+            "components": {
+                "jsbsim": { "aircraft": "f16c_block50", "altitude_ft": 25000.0, "heading_deg": 90.0, "airspeed_kts": 400.0 },
+                "airborne_radar": {}
+            }
+        },
+        {
+            "name": "Target",
+            "type": "aircraft",
+            "transform": { "pos": [150000.0, 25000.0, 0.0], "heading": 270.0 },
+            "components": {
+                "jsbsim": { "aircraft": "f16c_block50", "altitude_ft": 25000.0, "heading_deg": 270.0, "airspeed_kts": 400.0 }
+            }
+        }
+    ]
+}

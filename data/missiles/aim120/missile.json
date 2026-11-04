@@ -1,0 +1,121 @@
+{
+    "name": "AIM-120 AMRAAM",
+    "propulsion": {
+        "boost_duration_s": 3.0,
+        "boost_thrust_lbf": 5670.0,
+        "sustain_duration_s": 5.0,
+        "sustain_thrust_lbf": 3170.0
+    },
+    "mass": {
+        "dry_mass_slug": 6.294,
+        "propellant_mass_slug": 4.121
+    },
+    "aerodynamics": {
+        "reference_area_ft2": 0.267888,
+        "cd_vs_mach": [
+            [0.0, 0.3],
+            [0.5, 0.3],
+            [0.8, 0.35],
+            [0.9, 0.45],
+            [1.0, 0.6],
+            [1.1, 0.58],
+            [1.2, 0.5],
+            [1.5, 0.4],
+            [2.0, 0.35],
+            [3.0, 0.32],
+            [4.0, 0.3]
+        ],
+        "structural_g_limit": 30.0,
+        "normal_force": {
+            "alpha_max_deg": 30.0,
+            "cn_alpha_per_deg_vs_mach": [
+                [0.3, 0.3073],
+                [0.5, 0.3412],
+                [0.7, 0.341],
+                [0.8, 0.3393],
+                [0.9, 0.3207],
+                [1.0, 0.3009],
+                [1.1, 0.266],
+                [1.2, 0.2534],
+                [1.5, 0.2277],
+                [2.0, 0.2068],
+                [2.5, 0.1855],
+                [3.0, 0.183],
+                [4.0, 0.1922]
+            ],
+            "cn_max_vs_mach": [
+                [0.3, 13.342],
+                [0.5, 10.474],
+                [0.7, 10.513],
+                [0.8, 10.674],
+                [0.9, 12.352],
+                [1.0, 14.102],
+                [1.1, 18.441],
+                [1.2, 18.88],
+                [1.5, 19.508],
+                [2.0, 20.252],
+                [2.5, 18.725],
+                [3.0, 17.248],
+                [4.0, 15.266]
+            ]
+        }
+    },
+    "seeker": {
+        "mode": "MIDCOURSE_ARH",
+        "fov_half_angle_deg": 45.0,
+        "memory_coast_time_s": 1.5,
+        "active_seeker": {
+            "average_power_w": 100.0,
+            "antenna_gain": 148.0,
+            "frequency_hz": 1.0e10,
+            "noise_figure_db": 4.0,
+            "integration_time_s": 0.01,
+            "system_loss_db": 3.4527,
+            "pfa": 1e-6,
+            "sweep_period_s": 0.1,
+            "confirm_hits": 3,
+            "confirm_window": 5,
+            "antenna_diameter_m": 0.15,
+            "beamwidth_factor": 1.2,
+            "notch_velocity_threshold_mps": 15.0
+        }
+    },
+    "autopilot": {
+        "response_time_s": 0.35,
+        "launch_turn_exit_deg": 15.0
+    },
+    "loft": {
+        "start_range_nmi": 10.0,
+        "full_range_nmi": 40.0,
+        "max_climb_deg": 20.0,
+        "climb_time_constant_s": 2.0,
+        "min_available_g": 8.0
+    },
+    "fuze": {
+        "arming_range_m": 50.0,
+        "falloff_width_m": 5.0
+    },
+    "self_destruct": {
+        "min_available_g": 2.0,
+        "max_time_of_flight_s": 120.0
+    },
+    "notes": {
+        "propulsion": "Boost/sustain stage figures are AMRAAM-class estimates: the WPU-6/B motor's thrust history is not public. Constrained, not free: total impulse over propellant weight gives 247.8 s specific impulse against the ~245 s a solid HTPB motor achieves. See docs/REFERENCE.md 6.2 and docs/VALIDATION.md (AIM-120 sources).",
+        "mass": "6.294 + 4.121 slug = 91.9 + 60.1 kg = 152 kg, the published launch mass (Wikipedia, AIM-120 AMRAAM); the propellant load is the published motor's (156 lb motor, ~85% propellant, key.aero estimate). Two constraints, two numbers. See docs/REFERENCE.md 6.3.",
+        "reference_area_ft2": "pi (0.584 / 2)^2: the published 178 mm body diameter.",
+        "cd_vs_mach": "ILLUSTRATIVE, NOT AIM-120 data: a generic slender-body shape (flat subsonic, transonic wave-drag peak, supersonic settle); its accuracy against the real missile is unknown, since no measured AIM-120 drag is public. The shape is what the sim teaches. Zero-lift, motor-off (coast) drag, used for the whole flight. See docs/REFERENCE.md 6.4.",
+        "normal_force": "DERIVED, not measured: cn_alpha_per_deg_vs_mach and cn_max_vs_mach are computed by tools/fit/fit_normal_force.py from a component build-up (inputs: fit/normal_force_buildup.json) (NACA 1048 body, Jorgensen TN D-6996/D-7228 crossflow, NACA 1307 fins, from geometry measured off DTIC ADA355385 Fig 2; checked within ~10% of TM X-3310 supersonic). Values read off it: CN_max = the build-up's CN(alpha_max) at 25 000 ft; CN_alpha = the least-squares slope over alpha 0.5-10 deg with CN_max pinned. Rescaled to reference_area_ft2. Known gap: CN_max ~19-20 supersonic vs the IASGATG 2014 CFD study's 12-13 [S]. See docs/REFERENCE.md 6.5.",
+        "alpha_max_deg": "30 deg: fin flow separation in the IASGATG 2014 CFD study [S], the only source found. cn_max_vs_mach is the normal force at this angle, so changing it means refitting the tables. See docs/REFERENCE.md 6.5.",
+        "structural_g_limit": "No published structural limit. 30 G is the IASGATG CFD study's test load, inside the 25-40 G spread of unsourced claims. See docs/REFERENCE.md 6.5.",
+        "seeker_mode": "Inertial midcourse with datalink updates, then its own active seeker: how the AIM-120 is employed beyond visual range. See docs/REFERENCE.md 8.2.",
+        "seeker_gimbal": "fov_half_angle_deg and memory_coast_time_s are not published; chosen so a head-on shot never trips the cone. See docs/REFERENCE.md 8.1.",
+        "active_seeker": "X-band active seeker: f-16.net's AIM-120 article ('active X-band radar terminal seeker', 'high-power solid-state transmitter'); Jane's, quoted on the DCS forum, says I/J band (8-20 GHz), which covers X. No other AIM-120 seeker hardware figure is public. average_power_w 100: ESTIMATE. antenna_gain 148 (21.7 dBi): ESTIMATE, a 0.15 m dish inside the 7 in body at 60 % aperture efficiency, X-band. noise_figure_db 4 and integration_time_s 0.01 (one coherent look per 0.1 s sweep): ESTIMATES. pfa 1e-6: design convention; it sets the square-law threshold, ln(1/pfa) = 11.40 dB over noise. system_loss_db: FITTED, the only free parameter -- CALIBRATED by tools/fit/radar_budget.py so one look at a Swerling 1 5 m2 reference target (no aspect factor) detects with probability 0.5 at the commonly quoted ~10 nmi, in free space (fit/radar_fit.json); 9.3 nmi against the F-16 type's nose-on RCS estimate (3.78 m2). It absorbs the estimates above, so its 3.5 dB says little about the real seeker's losses. Acquisition needs confirm_hits of the last confirm_window sweeps (3 of 5): not published for the AIM-120; the commonly cited M-of-N baseline. At the nominal range each sweep is a coin flip, so 3 of 5 puts 50% acquisition exactly there instead of latching on the first scintillation spike. Doppler notch (the aircraft radar's rule seen from the missile, docs/REFERENCE.md 8.3 and 9.3): antenna_diameter_m 0.15, the dish behind the gain estimate above; beamwidth_factor 1.2, the radar's tapered-aperture estimate -> 1.2 lambda/D = 13.8 deg at 10 GHz, so the small dish sees ground far more often than the F-16's 4.3 deg beam; notch_velocity_threshold_mps 15: ESTIMATE, the radar's figure -- no AIM-120 clutter-filter figure is public. See docs/REFERENCE.md 8.3, 9.1 and 9.6.",
+        "gravity_bias": "Not a type field: every missile flies true PN (steered across the body axis, as lift must; true PN as defined in Palumbo et al., Basic Principles of Homing Guidance, JHU APL Tech. Digest 29(1), 2010, p. 29) with the gravity bias on. A tactical missile autopilot adds lift cancelling gravity's component across the body axis so guidance need not steer out the sag (gravity compensation; the bias is first-principles: cancel g across the body axis). Applies while guided, including after lock is lost. See docs/REFERENCE.md 6.8.",
+        "response_time_s": "ESTIMATE: one first-order lag for the seeker, fins and airframe together, the single-time-constant guidance system of miss-distance analysis (Palumbo et al., Basic Principles of Homing Guidance, JHU APL Tech. Digest 29(1), 2010, p. 36 Eqs. 41-42: the loop approximated as one first-order lag whose time constant is the sum of the seeker, filter and flight-control lags). NOT published for the AIM-120. 0.35 s is the sum of a seeker LOS-rate lag of 0.15 s and an actuator lag of 0.2 s, both estimates, inside the 0.1-0.5 s autopilot time constants of Palumbo's Fig. 14 example (p. 37). Type only, not a scenario knob. See docs/REFERENCE.md 7.4.",
+        "launch_turn_exit_deg": "ESTIMATE, no source looked up: after an off-boresight launch the autopilot turns toward the line of sight at its available G until the target is within 15 deg of the velocity vector, then proportional navigation takes over. 15 deg = a third of the 45 deg seeker gimbal, leaving PN room to hold the target inside it. Without the turn, a launch with the target just inside the gimbal acquired at once and lost the target as PN turned too slowly. The type's value, read-only in a scenario and in the GUI; 0 = no launch turn. See docs/REFERENCE.md 6.9.",
+        "loft": "FITTED, not published: no public source gives an AIM-120 loft angle, threshold range or apex (Wikipedia, Missile lofting [S]: air-to-air lofts peak at 20 000-110 000 ft, and loft exists to save energy in thin air; Barrie, IISS [S]: the AIM-120D3 gained range by trajectory shaping). Free parameters start_range_nmi, full_range_nmi, max_climb_deg, fitted to our own model: the climb angle that gives the highest end-game speed at fixed launch ranges 8-50 nmi, head-on at 15 000/25 000/35 000 ft, shooter and target Mach 0.9, with the type's own 120 s time of flight; rounded to a straight line, within ~5% of the best speed at almost every probed point (worst -11%, 15 000 ft at 40 nmi). Below ~10 nmi climbing gains nothing; 20 deg is also where Rmax peaks. climb_time_constant_s 2: ESTIMATE, so the pull-up asks a few G rather than the airframe's limit. min_available_g 8: ESTIMATE, picked from a launch-zone sweep (4 / 8 G, and 80 000 / 100 000 ft ceilings): once burnt out the climb ends when the turn ceiling (docs/REFERENCE.md 6.5) falls under 8 G, else a loft from 45 000 ft climbs into air too thin to steer and loses ~25 nmi of reach; 8 G and an 80 000 ft ceiling gave the same zone. Only a missile still steering on the datalink lofts. See docs/REFERENCE.md - Loft.",
+        "falloff_width_m": "Width of the Pk-vs-miss-distance sigmoid around the kill radius. ESTIMATE: no public AIM-120 lethality curve exists. See docs/REFERENCE.md 12.",
+        "arming_range_m": "Straight-line distance from launch before the fuze can register a kill. Kept as a distance by design; a fuze that arms on a time delay is not modelled. 50 m is not a published AIM-120 figure. See docs/REFERENCE.md 12.5.",
+        "self_destruct": "NOT published for the AIM-120: no primary source gives a time of flight, battery life or self-destruct time. min_available_g 2.0 is first-principles: the end of useful flight is aerodynamic (Raero, VRS Support Wiki [S]); below 2 G only 1 G is left after holding the airframe up. It is checked only after burnout, since at launch the missile can have under 3 G while still accelerating. max_time_of_flight_s 120 is an estimate, chosen as a backstop above every hit the sim then produced (<= 86 s); with the loft hits fly up to 119 s and it binds (5 of 220 batch runs would hit at 200 s). Forum and game figures (~80 s presumed, War Thunder; 140 s DCS game file) were consulted, not used. Only max_time_of_flight_s is a teaching knob (missile_doctrine.self_destruct.max_time_of_flight_s). See docs/REFERENCE.md 12.7."
+    }
+}

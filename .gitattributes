@@ -1,0 +1,4 @@
+# Normalize all tracked text files to LF, regardless of a contributor's
+# platform or editor. Overrides core.autocrlf on checkout too, so this is
+# the single source of truth for line endings in this repo.
+* text=auto eol=lf

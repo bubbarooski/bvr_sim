@@ -1,0 +1,434 @@
+{
+    "source": "T.O. GR1F-16CJ-1-1 (Hellenic Air Force F-16C/D supplemental flight manual, 15 June 2003), Appendix A, F100-PW-229, drag index 0, standard day, data basis flight test",
+    "accelerations": [
+        {
+            "label": "sea level -> M1.21 (800 KIAS limit)",
+            "flown_altitude_ft": 200,
+            "gross_weight_lb": 20000,
+            "start_mach": 0.3,
+            "end_mach": 1.21,
+            "time_s": 37,
+            "fuel_lb": 809,
+            "tolerance_pct": 10
+        },
+        {
+            "label": "10 000 ft -> M1.41 (800 KIAS limit)",
+            "flown_altitude_ft": 10000,
+            "gross_weight_lb": 20000,
+            "start_mach": 0.36,
+            "end_mach": 1.41,
+            "time_s": 46,
+            "fuel_lb": 832,
+            "tolerance_pct": 10
+        },
+        {
+            "label": "20 000 ft -> M1.68 (800 KIAS limit)",
+            "flown_altitude_ft": 20000,
+            "gross_weight_lb": 20000,
+            "start_mach": 0.44,
+            "end_mach": 1.68,
+            "time_s": 72,
+            "fuel_lb": 1091,
+            "tolerance_pct": 10
+        },
+        {
+            "label": "30 000 ft -> M1.75",
+            "flown_altitude_ft": 30000,
+            "gross_weight_lb": 20000,
+            "start_mach": 0.54,
+            "end_mach": 1.75,
+            "time_s": 86,
+            "fuel_lb": 901,
+            "tolerance_pct": 10
+        },
+        {
+            "label": "40 000 ft -> M1.83",
+            "flown_altitude_ft": 40000,
+            "gross_weight_lb": 20000,
+            "start_mach": 0.67,
+            "end_mach": 1.83,
+            "time_s": 123,
+            "fuel_lb": 870,
+            "tolerance_pct": 10
+        }
+    ],
+    "combat_ceilings": [
+        {
+            "gross_weight_lb": 20000,
+            "mach": 0.84,
+            "climb_fpm": 500,
+            "altitude_ft": 56300,
+            "tolerance_pct": 3,
+            "power": "MAXAB"
+        },
+        {
+            "gross_weight_lb": 24000,
+            "mach": 0.84,
+            "climb_fpm": 500,
+            "altitude_ft": 53000,
+            "tolerance_pct": 3,
+            "power": "MAXAB"
+        },
+        {
+            "power": "MIL",
+            "gross_weight_lb": 20000,
+            "mach": 0.84,
+            "climb_fpm": 500,
+            "altitude_ft": 50300,
+            "tolerance_pct": 3
+        },
+        {
+            "power": "MIL",
+            "gross_weight_lb": 24000,
+            "mach": 0.84,
+            "climb_fpm": 500,
+            "altitude_ft": 46700,
+            "tolerance_pct": 3
+        }
+    ],
+    "sustained_turns": [
+        {
+            "altitude_ft": 15000,
+            "mach": 0.6,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 12.54,
+            "tolerance_pct": 10
+        },
+        {
+            "altitude_ft": 15000,
+            "mach": 0.8,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 13.85,
+            "tolerance_pct": 10
+        },
+        {
+            "altitude_ft": 15000,
+            "mach": 0.9,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 13.93,
+            "tolerance_pct": 10
+        },
+        {
+            "altitude_ft": 30000,
+            "mach": 0.6,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 6.56,
+            "tolerance_pct": 10
+        },
+        {
+            "altitude_ft": 30000,
+            "mach": 0.8,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 7.57,
+            "tolerance_pct": 10
+        },
+        {
+            "altitude_ft": 30000,
+            "mach": 0.9,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 7.88,
+            "tolerance_pct": 10
+        },
+        {
+            "altitude_ft": 40000,
+            "mach": 0.8,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 4.45,
+            "tolerance_pct": 10
+        },
+        {
+            "altitude_ft": 40000,
+            "mach": 0.9,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 4.69,
+            "tolerance_pct": 10
+        },
+        {
+            "altitude_ft": 40000,
+            "mach": 1.2,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 4.08,
+            "tolerance_pct": 10
+        },
+        {
+            "altitude_ft": 50000,
+            "mach": 0.8,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 1.75,
+            "tolerance_pct": 10
+        },
+        {
+            "altitude_ft": 50000,
+            "mach": 0.9,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 2.24,
+            "tolerance_pct": 10
+        }
+    ],
+    "climb_envelope_tolerance_pct": 3,
+    "quickest_turns": [
+        {
+            "flown_altitude_ft": 1000,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 24.8,
+            "sweep_from_kts": 330,
+            "sweep_to_kts": 480,
+            "tolerance_pct": 5
+        },
+        {
+            "flown_altitude_ft": 5000,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 22.7,
+            "sweep_from_kts": 360,
+            "sweep_to_kts": 510,
+            "tolerance_pct": 5
+        },
+        {
+            "flown_altitude_ft": 10000,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 20.8,
+            "sweep_from_kts": 390,
+            "sweep_to_kts": 540,
+            "tolerance_pct": 5
+        },
+        {
+            "flown_altitude_ft": 15000,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 19.0,
+            "sweep_from_kts": 430,
+            "sweep_to_kts": 580,
+            "tolerance_pct": 5
+        },
+        {
+            "flown_altitude_ft": 20000,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 17.4,
+            "sweep_from_kts": 460,
+            "sweep_to_kts": 630,
+            "tolerance_pct": 5
+        },
+        {
+            "flown_altitude_ft": 30000,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 14.4,
+            "sweep_from_kts": 480,
+            "sweep_to_kts": 700,
+            "tolerance_pct": 5
+        },
+        {
+            "flown_altitude_ft": 40000,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 9.6,
+            "sweep_from_kts": 420,
+            "sweep_to_kts": 660,
+            "tolerance_pct": 5
+        },
+        {
+            "flown_altitude_ft": 50000,
+            "gross_weight_lb": 22000,
+            "rate_deg_s": 5.9,
+            "sweep_from_kts": 420,
+            "sweep_to_kts": 680,
+            "tolerance_pct": 5
+        }
+    ],
+    "notes": {
+        "accelerations": "MAX AB from 200 KIAS (Figs A8-9 to A8-13). Sea level is flown at 200 ft, clear of the terrain. At 30 000 and 40 000 ft the tables end (combat speed M1.91, limit M2.03) within a few hundredths of Mach of top speed, where the time to go is asymptotic, so those two stop at the last row with real acceleration left. The thrust tables are fitted to these tables, so the times check the fit through the whole simulator; fuel is not fitted.",
+        "combat_ceilings": "Fig. A8-1: altitude where 500 ft/min of climb remains, at the optimum cruise Mach (0.84 at drag index 0), MAX AB (dashed) and MIL (solid). Read off a 400 dpi render of the chart, +-200 ft. Thrust above 40 000 ft (30 000 ft at MIL) is extrapolated from the fit with one calibrated extra lapse exponent (fit/thrust_fit.json), so these check that extrapolation.",
+        "sustained_turns": "Turn Performance charts, MAX AB, drag index 0, 22 000 lb (Figs A8-40 15 000 ft, A8-43 30 000 ft, A8-45 40 000 ft, A8-47 50 000 ft): the Ps = 0 line, digitised from the PDF's vector paths (axes calibrated from the tick labels, +-0.1 deg/s).",
+        "climb_envelope": "Fig. A8-2 (Level Flight Combat Speeds and Altitudes), drag index 0, 20 000 lb: the altitude, at each Mach, where 500 ft/min of climb remains at 1 g. MIL digitised from the PDF's vector path; MAX AB (drawn in short segments) read off a 300 dpi render, +-300 ft. Data in climb_envelope.csv. The MIL rows are also what military thrust above 30 000 ft is fitted to (tools/fit/thrust_fit.py), so they check the fit; the MAX AB rows are independent.",
+        "quickest_turns": "Turn Performance charts (Figs A8-37..47, MAX AB, drag index 0, 22 000 lb): the 'QUICKEST TURN (x DEGREES/SECOND)' label of each chart, parsed from the PDF text. Sea level is flown at 1 000 ft (the rig sits on the terrain lower), ~3% thinner air, ~1.5% on a 9 G rate. Below ~25 000 ft the quickest turn is at 9 G, so these test the lift the FCS allows at 9 G (the G/AoA limiter); above, lift and thrust."
+    },
+    "fuel_flow": {
+        "source": "Fig. A8-4, Fuel Flow (MIL/MAX AB), standard day, data basis flight test (reference/fuel_flow.csv, digitised from the PDF's vector curves)",
+        "tolerance_pct": 5,
+        "rows": [
+            {
+                "label": "fuel flow, MAX AB sea level",
+                "power": "MAXAB",
+                "flown_altitude_ft": 200,
+                "gross_weight_lb": 20000,
+                "start_mach": 0.3,
+                "end_mach": 1.21
+            },
+            {
+                "label": "fuel flow, MAX AB 10 000 ft",
+                "power": "MAXAB",
+                "flown_altitude_ft": 10000,
+                "gross_weight_lb": 20000,
+                "start_mach": 0.36,
+                "end_mach": 1.41
+            },
+            {
+                "label": "fuel flow, MAX AB 20 000 ft",
+                "power": "MAXAB",
+                "flown_altitude_ft": 20000,
+                "gross_weight_lb": 20000,
+                "start_mach": 0.44,
+                "end_mach": 1.68
+            },
+            {
+                "label": "fuel flow, MAX AB 30 000 ft",
+                "power": "MAXAB",
+                "flown_altitude_ft": 30000,
+                "gross_weight_lb": 20000,
+                "start_mach": 0.54,
+                "end_mach": 1.75
+            },
+            {
+                "label": "fuel flow, MAX AB 40 000 ft",
+                "power": "MAXAB",
+                "flown_altitude_ft": 40000,
+                "gross_weight_lb": 20000,
+                "start_mach": 0.67,
+                "end_mach": 1.83
+            },
+            {
+                "label": "fuel flow, MIL sea level",
+                "power": "MIL",
+                "flown_altitude_ft": 200,
+                "gross_weight_lb": 20000,
+                "start_mach": 0.3,
+                "end_mach": 0.91
+            },
+            {
+                "label": "fuel flow, MIL 10 000 ft",
+                "power": "MIL",
+                "flown_altitude_ft": 10000,
+                "gross_weight_lb": 20000,
+                "start_mach": 0.36,
+                "end_mach": 0.95
+            },
+            {
+                "label": "fuel flow, MIL 20 000 ft",
+                "power": "MIL",
+                "flown_altitude_ft": 20000,
+                "gross_weight_lb": 20000,
+                "start_mach": 0.44,
+                "end_mach": 0.95
+            },
+            {
+                "label": "fuel flow, MIL 30 000 ft",
+                "power": "MIL",
+                "flown_altitude_ft": 30000,
+                "gross_weight_lb": 20000,
+                "start_mach": 0.54,
+                "end_mach": 0.9
+            }
+        ]
+    },
+    "cruise_fuel": {
+        "source": "Subsonic Cruise tables, standard day, drag index 0, total fuel flow at 24 000 lb (reference/cruise_fuel.csv, parsed from the PDF text)",
+        "tolerance_pct": 5,
+        "rows": [
+            {
+                "altitude_ft": 0,
+                "ktas": 240,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 2701
+            },
+            {
+                "altitude_ft": 0,
+                "ktas": 360,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 3846
+            },
+            {
+                "altitude_ft": 0,
+                "ktas": 480,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 6039
+            },
+            {
+                "altitude_ft": 0,
+                "ktas": 570,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 8920
+            },
+            {
+                "altitude_ft": 8000,
+                "ktas": 300,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 2653
+            },
+            {
+                "altitude_ft": 8000,
+                "ktas": 420,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 3819
+            },
+            {
+                "altitude_ft": 8000,
+                "ktas": 540,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 6071
+            },
+            {
+                "altitude_ft": 16000,
+                "ktas": 270,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 2391
+            },
+            {
+                "altitude_ft": 16000,
+                "ktas": 390,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 2808
+            },
+            {
+                "altitude_ft": 16000,
+                "ktas": 510,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 4198
+            },
+            {
+                "altitude_ft": 25000,
+                "ktas": 330,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 2205
+            },
+            {
+                "altitude_ft": 25000,
+                "ktas": 450,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 2624
+            },
+            {
+                "altitude_ft": 25000,
+                "ktas": 570,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 5388
+            },
+            {
+                "altitude_ft": 35000,
+                "ktas": 420,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 2082
+            },
+            {
+                "altitude_ft": 35000,
+                "ktas": 480,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 2291
+            },
+            {
+                "altitude_ft": 35000,
+                "ktas": 540,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 3371
+            },
+            {
+                "altitude_ft": 40000,
+                "ktas": 480,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 2207
+            },
+            {
+                "altitude_ft": 40000,
+                "ktas": 510,
+                "gross_weight_lb": 24000,
+                "fuel_flow_pph": 2373
+            }
+        ]
+    }
+}

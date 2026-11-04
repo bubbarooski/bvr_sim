@@ -1,0 +1,30 @@
+{
+    "fit_gross_weights_lb": [
+        20000,
+        24000,
+        28000
+    ],
+    "drag_sample_gross_weights_lb": [
+        18000,
+        20000,
+        22000,
+        24000,
+        26000,
+        28000
+    ],
+    "extra_aug_mach_rows": [
+        1.7,
+        1.9,
+        2.1
+    ],
+    "stratosphere_extra_lapse_exponent": 0.25,
+    "fit_mil_to_climb_envelope": true,
+    "notes": {
+        "fit_gross_weights_lb": "The flight manual's acceleration columns the thrust is fitted to. Thrust does not depend on weight, so how well one curve fits all three checks the drag due to lift. 32 000 and 36 000 lb are beyond what the model's tanks can load.",
+        "drag_sample_gross_weights_lb": "Weights drag_sample flies at each altitude, bracketing the fit weights as fuel burns, so drag can be regressed on lift squared.",
+        "extra_aug_mach_rows": "At 30 000 and 40 000 ft the manual's Ps falls steeply between Mach 1.8 and 2.0 (453 -> 226 -> 31 ft/s at 40 000 ft); the engine table's 0.2-Mach rows could only follow it by overshooting.",
+        "stratosphere_extra_lapse_exponent": "Afterburning thrust above 40 000 ft scales as delta^(1+k): augmentor combustion efficiency falls with burner pressure. k = 0.25 CALIBRATED to the combat ceiling chart (Fig. A8-1, MAX AB, 20 000 and 24 000 lb: 56 300 / 53 000 ft); k = 0 left them 2 900 / 2 500 ft high, 0.5 1 300 / 1 100 ft low. Checked against what was not used: the 50 000 ft sustained turns (-3 / -4%) and the MAX AB climb envelope (0 to -5%).",
+        "stratosphere_extra_lapse_exponent_mil": "0: military thrust above its fitted 40 000 ft column scales with pressure alone.",
+        "fit_mil_to_climb_envelope": "Military thrust at 40 000 ft is fitted to the MIL 500 ft/min climb envelope (reference/climb_envelope.csv, Fig. A8-2); the accelerations stop at 30 000 ft for MIL. Checked against the MIL combat ceiling chart (Fig. A8-1), not used: -0.7 / +1.7%."
+    }
+}

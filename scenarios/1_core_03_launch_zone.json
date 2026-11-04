@@ -1,0 +1,56 @@
+{
+    "description": "The launch zone's maximum range (Rmax) is the farthest shot that still reaches a target that keeps flying straight. Here, at 10 000 ft, the Pursuer fires as soon as its track puts the Target inside Rmax (the event log's LAUNCH_ZONE_ENTERED line shows the estimated range and Rmax). About a minute later the Target turns around and runs at 550 kt; the missile has burned its motor long before and can't close, so it falls short behind it. Lower 'Launch range fraction' to 0.4 and Reset: now the Pursuer waits for a closer shot, the Target turns away first, and the shot never comes. Firing early or waiting is a trade.",
+    "seed": 3030,
+    "sim_speed": 1.0,
+    "missile_doctrine": {
+        "missile": "aim120",
+        "kill_radius_m": 12.0,
+        "max_range_m": 150000.0,
+        "nav_gain": 5.0
+    },
+    "entities": [
+        {
+            "name": "Pursuer",
+            "type": "aircraft",
+            "transform": {
+                "pos": [-150000.0, 10000.0, 0.0],
+                "heading": 90.0
+            },
+            "components": {
+                "jsbsim": {
+                    "aircraft": "f16c_block50",
+                    "altitude_ft": 10000.0,
+                    "heading_deg": 90.0,
+                    "airspeed_kts": 400.0
+                },
+                "airborne_radar": {}
+            }
+        },
+        {
+            "name": "Target",
+            "type": "aircraft",
+            "transform": {
+                "pos": [150000.0, 10000.0, 0.0],
+                "heading": 270.0
+            },
+            "components": {
+                "jsbsim": {
+                    "aircraft": "f16c_block50",
+                    "altitude_ft": 10000.0,
+                    "heading_deg": 270.0,
+                    "airspeed_kts": 400.0
+                },
+                "waypoints": {
+                    "points": [
+                        [70000.0, 10000.0, 0.0],
+                        [62000.0, 10000.0, 8000.0],
+                        [400000.0, 10000.0, 8000.0]
+                    ],
+                    "speeds_kts": [null, 550.0, 550.0],
+                    "arrival_radius_m": 1000,
+                    "loop": false
+                }
+            }
+        }
+    ]
+}

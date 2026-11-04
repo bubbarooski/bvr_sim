@@ -1,0 +1,25 @@
+{
+    "seed": 1001,
+    "sim_speed": 1.0,
+    "entities": [
+        {
+            "name": "Patrol",
+            "type": "aircraft",
+            "transform": { "pos": [0.0, 25000.0, 0.0], "heading": 90.0 },
+            "components": {
+                "jsbsim": { "aircraft": "f16c_block50", "altitude_ft": 25000.0, "heading_deg": 90.0, "airspeed_kts": 400.0 },
+                "waypoints": {
+                    "points": [
+                        [80000.0, 25000.0, 0.0],
+                        [80000.0, 25000.0, 80000.0],
+                        [-80000.0, 25000.0, 80000.0],
+                        [-80000.0, 25000.0, 0.0]
+                    ],
+                    "speeds_kts": [300.0, null, 450.0, null],
+                    "arrival_radius_m": 1000,
+                    "loop": true
+                }
+            }
+        }
+    ]
+}

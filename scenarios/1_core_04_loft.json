@@ -1,0 +1,56 @@
+{
+    "description": "Loft. On a long shot the missile climbs after launch, cruises in thin air where drag is low, then pushes over onto the Target. Here the Target turns around and runs late in the missile's flight: the lofted missile arrives sooner and with more speed, and still catches it. Turn 'Loft' off and Reset: the missile flies straight at 25 000 ft through thicker air, arrives later and slower, and falls short. Watch the arc from the side.",
+    "seed": 4040,
+    "sim_speed": 1.0,
+    "missile_doctrine": {
+        "missile": "aim120",
+        "kill_radius_m": 12.0,
+        "max_range_m": 150000.0,
+        "nav_gain": 5.0
+    },
+    "entities": [
+        {
+            "name": "Pursuer",
+            "type": "aircraft",
+            "transform": {
+                "pos": [-150000.0, 25000.0, 0.0],
+                "heading": 90.0
+            },
+            "components": {
+                "jsbsim": {
+                    "aircraft": "f16c_block50",
+                    "altitude_ft": 25000.0,
+                    "heading_deg": 90.0,
+                    "airspeed_kts": 400.0
+                },
+                "airborne_radar": {}
+            }
+        },
+        {
+            "name": "Target",
+            "type": "aircraft",
+            "transform": {
+                "pos": [150000.0, 25000.0, 0.0],
+                "heading": 270.0
+            },
+            "components": {
+                "jsbsim": {
+                    "aircraft": "f16c_block50",
+                    "altitude_ft": 25000.0,
+                    "heading_deg": 270.0,
+                    "airspeed_kts": 400.0
+                },
+                "waypoints": {
+                    "points": [
+                        [80000.0, 25000.0, 0.0],
+                        [72000.0, 25000.0, 8000.0],
+                        [500000.0, 25000.0, 8000.0]
+                    ],
+                    "speeds_kts": [null, 550.0, 550.0],
+                    "arrival_radius_m": 1000,
+                    "loop": false
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,48 @@
+{
+    "description": "Radar only: no missile. Watch the Pursuer's radar cone: green while it scans, amber once a track is confirmed (the target must show up in 3 of 5 scan frames, 4.4 s each). Later the Pursuer turns 90 degrees away; the radar only scans 60 degrees either side of the nose, so the target falls outside it, the track drops after 3 missed frames and the cone goes back to green. Try the Airborne radar 'Reference detection range' knob and Reset.",
+    "seed": 4401,
+    "sim_speed": 1.0,
+    "entities": [
+        {
+            "name": "Pursuer",
+            "type": "aircraft",
+            "transform": {
+                "pos": [-150000.0, 25000.0, 0.0],
+                "heading": 90.0
+            },
+            "components": {
+                "jsbsim": {
+                    "aircraft": "f16c_block50",
+                    "altitude_ft": 25000.0,
+                    "heading_deg": 90.0,
+                    "airspeed_kts": 400.0
+                },
+                "airborne_radar": {},
+                "waypoints": {
+                    "points": [
+                        [-60000.0, 25000.0, 0.0],
+                        [-60000.0, 25000.0, 400000.0]
+                    ],
+                    "arrival_radius_m": 1000,
+                    "loop": false
+                }
+            }
+        },
+        {
+            "name": "Target",
+            "type": "aircraft",
+            "transform": {
+                "pos": [150000.0, 25000.0, 0.0],
+                "heading": 270.0
+            },
+            "components": {
+                "jsbsim": {
+                    "aircraft": "f16c_block50",
+                    "altitude_ft": 25000.0,
+                    "heading_deg": 270.0,
+                    "airspeed_kts": 400.0
+                }
+            }
+        }
+    ]
+}

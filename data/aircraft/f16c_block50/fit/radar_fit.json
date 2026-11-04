@@ -1,0 +1,10 @@
+{
+    "range_nmi": 50,
+    "rcs_m2": 5,
+    "reference_fluctuation": "swerling_1",
+    "notes": {
+        "range_nmi": "The cited search detection range. Published APG-68 ranges disagree and none states its target: 35 nm look-up (Radartutorial), ~43 nmi ('50 mi', Wikipedia citing Deagel), ~57 nmi against 5 m2 (a wiki mirror). 50 nmi sits at the top of that spread. See docs/VALIDATION.md (Sources > Radar).",
+        "rcs_m2": "The reference target the citation is read against: a 5 m2 fighter-sized target, no aspect factor: one reference size for fitting and testing, radar and seeker alike. Not the F-16 type's own RCS, which is the shape estimate in aircraft.json signature.rcs_shape: nose-on (3.78 m2) the same radar's coin flip is at 46.6 nmi, beam-on (25.4 m2) 75.1 nmi.",
+        "reference_fluctuation": "The reference target fluctuates as Swerling 1, like the F-16 type: the cited range is read as the range at which ONE look detects it with probability 0.5."
+    }
+}

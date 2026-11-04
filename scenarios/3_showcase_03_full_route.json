@@ -1,0 +1,68 @@
+{
+    "description": "Everything at once (starts at 2x speed). Both aircraft fly multi-leg routes: the Pursuer climbs from 20 000 to 32 000 ft and turns three times (about 34 degrees each); the Target climbs to 30 000 ft, bends toward the north-west, then dives to 12 000 ft and runs west. Nothing is staged around the shot: the radar finds the Target when the routes bring it into the scan, the Pursuer fires when the track is inside the zone, and the turns, climbs and dive do the rest. Expect track drops when the Pursuer turns, long lofted shots, and the occasional shot that runs out of time. Change the routes in Waypoint Placement Mode and see what happens.",
+    "seed": 3505,
+    "sim_speed": 2.0,
+    "missile_doctrine": {
+        "missile": "aim120",
+        "kill_radius_m": 12.0,
+        "max_range_m": 150000.0,
+        "nav_gain": 5.0
+    },
+    "entities": [
+        {
+            "name": "Pursuer",
+            "type": "aircraft",
+            "transform": {
+                "pos": [-200000.0, 20000.0, 60000.0],
+                "heading": 120.0
+            },
+            "components": {
+                "jsbsim": {
+                    "aircraft": "f16c_block50",
+                    "altitude_ft": 20000.0,
+                    "heading_deg": 120.0,
+                    "airspeed_kts": 420.0
+                },
+                "airborne_radar": {},
+                "waypoints": {
+                    "points": [
+                        [-140000.0, 32000.0, 20000.0],
+                        [-60000.0, 32000.0, 20000.0],
+                        [0.0, 30000.0, 60000.0],
+                        [300000.0, 30000.0, 60000.0]
+                    ],
+                    "speeds_kts": [480.0, 520.0, null, null],
+                    "arrival_radius_m": 1500,
+                    "loop": false
+                }
+            }
+        },
+        {
+            "name": "Target",
+            "type": "aircraft",
+            "transform": {
+                "pos": [260000.0, 18000.0, -120000.0],
+                "heading": 300.0
+            },
+            "components": {
+                "jsbsim": {
+                    "aircraft": "f16c_block50",
+                    "altitude_ft": 18000.0,
+                    "heading_deg": 300.0,
+                    "airspeed_kts": 450.0
+                },
+                "waypoints": {
+                    "points": [
+                        [180000.0, 30000.0, -70000.0],
+                        [120000.0, 30000.0, 10000.0],
+                        [60000.0, 12000.0, 30000.0],
+                        [-300000.0, 12000.0, 30000.0]
+                    ],
+                    "speeds_kts": [null, 480.0, 540.0, 540.0],
+                    "arrival_radius_m": 1500,
+                    "loop": false
+                }
+            }
+        }
+    ]
+}

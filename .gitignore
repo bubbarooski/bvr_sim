@@ -1,0 +1,34 @@
+.clinerules
+build/
+out/
+.vs/
+
+# Local tooling config -- kept on disk, deliberately untracked.
+/.claude/
+
+# Generated PDFs (rebuild: python tools/analysis/build_reference_pdf.py)
+docs/intercept_sim_reference.pdf
+docs/intercept_sim_validation.pdf
+docs/intercept_sim_reference.html
+docs/timing_report.pdf
+
+# Monte Carlo output: specs, results CSVs, and recorded trajectories.
+# Regenerate by re-running the experiment script that produced them.
+experiments/results/
+output/
+
+__pycache__/
+*.pyc
+
+# Local-only design/process docs -- kept on disk, deliberately untracked.
+/CLAUDE.md
+/docs/GUI_DESIGN.md
+/docs/NOTES.md
+/docs/notes_archive/
+/docs/OVERVIEW.md
+/docs/PROJECT_STRUCTURE.md
+
+
+# Save As output; only the New Scenario template is part of the repo.
+/scenarios/custom/*
+!/scenarios/custom/_template.json

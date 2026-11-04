@@ -1,0 +1,66 @@
+{
+    "description": "SARH (semi-active radar homing): the missile has no transmitter of its own. It homes on the Pursuer's radar energy reflecting off the Target, so the Pursuer must hold a single-target lock and keep the Target inside its radar's 60-degree scan limit until impact. Here the Pursuer turns 90 degrees away while the missile is in flight: the illumination stops, the missile goes blind and flies on to where the Target was heading, and when the Target then turns 45 degrees it misses. Set 'Seeker mode' to MIDCOURSE_ARH and Reset: a missile with its own active radar finds the Target by itself ('fire and forget').",
+    "seed": 6060,
+    "sim_speed": 1.0,
+    "missile_doctrine": {
+        "missile": "aim120",
+        "kill_radius_m": 12.0,
+        "max_range_m": 150000.0,
+        "nav_gain": 5.0,
+        "seeker": {
+            "mode": "SARH"
+        }
+    },
+    "entities": [
+        {
+            "name": "Pursuer",
+            "type": "aircraft",
+            "transform": {
+                "pos": [-150000.0, 25000.0, 0.0],
+                "heading": 90.0
+            },
+            "components": {
+                "jsbsim": {
+                    "aircraft": "f16c_block50",
+                    "altitude_ft": 25000.0,
+                    "heading_deg": 90.0,
+                    "airspeed_kts": 400.0
+                },
+                "airborne_radar": {},
+                "waypoints": {
+                    "points": [
+                        [-90000.0, 25000.0, 0.0],
+                        [-90000.0, 25000.0, 400000.0]
+                    ],
+                    "arrival_radius_m": 1000,
+                    "loop": false
+                }
+            }
+        },
+        {
+            "name": "Target",
+            "type": "aircraft",
+            "transform": {
+                "pos": [150000.0, 25000.0, 0.0],
+                "heading": 270.0
+            },
+            "components": {
+                "jsbsim": {
+                    "aircraft": "f16c_block50",
+                    "altitude_ft": 25000.0,
+                    "heading_deg": 270.0,
+                    "airspeed_kts": 400.0
+                },
+                "waypoints": {
+                    "points": [
+                        [70000.0, 25000.0, 0.0],
+                        [40000.0, 25000.0, 30000.0],
+                        [-300000.0, 25000.0, 360000.0]
+                    ],
+                    "arrival_radius_m": 1000,
+                    "loop": false
+                }
+            }
+        }
+    ]
+}

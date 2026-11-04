@@ -1,0 +1,6 @@
+# Python tooling only -- the simulator itself is pure C++/CMake.
+#
+# pandas: experiments/ Monte Carlo analysis (_framework.py's load_results/load_events)
+# mistune: tools/analysis/build_reference_pdf.py's markdown -> HTML render step (needs the 3.x renderer API)
+pandas>=2,<3
+mistune>=3,<4

@@ -1,0 +1,11 @@
+{
+    "fit_max_altitude_ft": {
+        "MIL": 30000,
+        "MAXAB": 40000
+    },
+    "notes": {
+        "fit_max_altitude_ft": "The highest chart altitude fitted. Thrust is fitted to flight data up to 30 000 ft for MIL (its 40 000 ft column rests on the climb envelope, not accelerations) and 40 000 ft for MAX AB; above that thrust is extrapolated, so the chart's higher curves check thrust and fuel flow together instead of being fitted.",
+        "cruise_holdout_gross_weight_lb": "The gross weight whose cruise points real_world_validation flies; left out of the part-throttle fit so those validation rows are not fitted."
+    },
+    "cruise_holdout_gross_weight_lb": 24000
+}

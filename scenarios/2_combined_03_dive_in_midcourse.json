@@ -1,0 +1,56 @@
+{
+    "description": "A target that dives in midcourse. Both start at 30 000 ft; after the shot the Target dives to 5 000 ft at 550 kt. Watch from the side: the missile lofts to about 75 000 ft (LOFT_END in the event log), and the datalink keeps bending its path down toward where the Target now is. Looking steeply down at a diving target, the seeker briefly loses it against the ground (SEEKER_LOST doppler_notch), falls back on the datalink, and finds it again. Loft, datalink and seeker working as one.",
+    "seed": 2303,
+    "sim_speed": 1.0,
+    "missile_doctrine": {
+        "missile": "aim120",
+        "kill_radius_m": 12.0,
+        "max_range_m": 150000.0,
+        "nav_gain": 5.0
+    },
+    "entities": [
+        {
+            "name": "Pursuer",
+            "type": "aircraft",
+            "transform": {
+                "pos": [-150000.0, 30000.0, 0.0],
+                "heading": 90.0
+            },
+            "components": {
+                "jsbsim": {
+                    "aircraft": "f16c_block50",
+                    "altitude_ft": 30000.0,
+                    "heading_deg": 90.0,
+                    "airspeed_kts": 400.0
+                },
+                "airborne_radar": {}
+            }
+        },
+        {
+            "name": "Target",
+            "type": "aircraft",
+            "transform": {
+                "pos": [150000.0, 30000.0, 0.0],
+                "heading": 270.0
+            },
+            "components": {
+                "jsbsim": {
+                    "aircraft": "f16c_block50",
+                    "altitude_ft": 30000.0,
+                    "heading_deg": 270.0,
+                    "airspeed_kts": 400.0
+                },
+                "waypoints": {
+                    "points": [
+                        [110000.0, 30000.0, 0.0],
+                        [40000.0, 5000.0, 0.0],
+                        [-300000.0, 5000.0, 0.0]
+                    ],
+                    "speeds_kts": [null, 550.0, 550.0],
+                    "arrival_radius_m": 1000,
+                    "loop": false
+                }
+            }
+        }
+    ]
+}

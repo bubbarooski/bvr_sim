@@ -1,0 +1,49 @@
+{
+    "description": "The Target carries a radar warning receiver (RWR): select it and watch 'Perceived Mode' in the Entity Inspector. This shot is fired in TWS (track-while-scan): the radar keeps scanning, so the Target hears only search sweeps, and its first real warning is the missile's own seeker going active, about 40 s before impact. Set Launch mode to STT and Reset: the radar locks the Target before it fires, so the RWR shows Lock about 90 s before impact. The trade: an STT track is more accurate (watch the datalink error when the seeker goes active).",
+    "seed": 5150,
+    "sim_speed": 1.0,
+    "missile_doctrine": {
+        "missile": "aim120",
+        "kill_radius_m": 12.0,
+        "max_range_m": 150000.0,
+        "nav_gain": 5.0
+    },
+    "entities": [
+        {
+            "name": "Pursuer",
+            "type": "aircraft",
+            "transform": {
+                "pos": [-150000.0, 25000.0, 0.0],
+                "heading": 90.0
+            },
+            "components": {
+                "jsbsim": {
+                    "aircraft": "f16c_block50",
+                    "altitude_ft": 25000.0,
+                    "heading_deg": 90.0,
+                    "airspeed_kts": 400.0
+                },
+                "airborne_radar": {}
+            }
+        },
+        {
+            "name": "Target",
+            "type": "aircraft",
+            "transform": {
+                "pos": [150000.0, 25000.0, 0.0],
+                "heading": 270.0
+            },
+            "components": {
+                "jsbsim": {
+                    "aircraft": "f16c_block50",
+                    "altitude_ft": 25000.0,
+                    "heading_deg": 270.0,
+                    "airspeed_kts": 400.0
+                },
+                "evasion": {
+                    "rwr": {}
+                }
+            }
+        }
+    ]
+}

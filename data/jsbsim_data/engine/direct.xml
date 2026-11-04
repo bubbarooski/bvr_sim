@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!--
+  Minimal "direct" thruster (JSBSim FGThruster, FGEngine::LoadThruster's
+  "direct" branch), passing engine thrust straight through with no
+  propeller/nozzle/rotor model, the standard choice for a turbojet/turbofan.
+  f16.xml's thruster (file="direct") already supplies location/orientation
+  itself; FGThruster's constructor needs nothing more than this element to
+  exist with a name. Not present in the vendored deps/jsbsim engine set;
+  added here for the F-16 model.
+-->
+<direct name="Direct">
+</direct>

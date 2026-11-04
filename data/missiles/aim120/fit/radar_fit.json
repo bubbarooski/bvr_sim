@@ -1,0 +1,10 @@
+{
+    "range_nmi": 10,
+    "rcs_m2": 5,
+    "reference_fluctuation": "swerling_1",
+    "notes": {
+        "range_nmi": "The commonly quoted AIM-120 'pitbull' acquisition range. No primary source found; see docs/REFERENCE.md 8.3.",
+        "rcs_m2": "The reference target, no aspect factor: the same convention as the aircraft radar's fit. Against the F-16 type's own RCS shape estimate the per-look coin flip is at 9.3 nmi nose-on (3.78 m2), 15.0 nmi beam-on (25.4 m2).",
+        "reference_fluctuation": "The reference target fluctuates as Swerling 1, like the F-16 type: the cited range is read as the range at which ONE look detects it with probability 0.5."
+    }
+}

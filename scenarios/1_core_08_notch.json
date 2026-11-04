@@ -1,0 +1,58 @@
+{
+    "description": "The Doppler notch. A pulse-Doppler radar whose beam also hits the ground must throw away returns that move like the ground, so it rejects anything with almost no speed along its line of sight. After the shot the Target turns to fly at right angles to the Pursuer (it 'beams'): its speed along the line of sight falls to near zero, the Pursuer's radar loses the track, and with it the datalink to the missile. Watch the missile's seeker lose the Target too, then pick it up again as the geometry changes. Notching buys time and breaks the datalink; it does not always save the Target.",
+    "seed": 55555,
+    "sim_speed": 3.0,
+    "missile_doctrine": {
+        "missile": "aim120",
+        "kill_radius_m": 12.0,
+        "max_range_m": 150000.0,
+        "nav_gain": 5.0,
+        "launch_range_fraction": 0.6
+    },
+    "entities": [
+        {
+            "name": "Pursuer",
+            "type": "aircraft",
+            "transform": {
+                "pos": [-150000.0, 25000.0, 0.0],
+                "heading": 90.0
+            },
+            "components": {
+                "jsbsim": {
+                    "aircraft": "f16c_block50",
+                    "altitude_ft": 25000.0,
+                    "heading_deg": 90.0,
+                    "airspeed_kts": 400.0
+                },
+                "airborne_radar": {}
+            }
+        },
+        {
+            "name": "Target",
+            "type": "aircraft",
+            "transform": {
+                "pos": [150000.0, 25000.0, 0.0],
+                "heading": 270.0
+            },
+            "components": {
+                "jsbsim": {
+                    "aircraft": "f16c_block50",
+                    "altitude_ft": 25000.0,
+                    "heading_deg": 270.0,
+                    "airspeed_kts": 400.0
+                },
+                "waypoints": {
+                    "points": [
+                        [82000.0, 25000.0, 0.0],
+                        [82000.0, 25000.0, 150000.0]
+                    ],
+                    "arrival_radius_m": 1000,
+                    "loop": false
+                },
+                "evasion": {
+                    "rwr": {}
+                }
+            }
+        }
+    ]
+}
