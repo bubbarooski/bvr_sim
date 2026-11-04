@@ -914,10 +914,13 @@ void DrawSeekerCones(World& world, const FrameView& frame, float opacity) {
 // point, plus a diamond at each. queue.front reads brighter -- the same
 // "more relevant = more opaque" convention used elsewhere.
 //
-// Capped to a generous lookahead, since hand-placed routes run long. A
-// looping queue's back entry is always the point just left, so rendering
-// it would draw a segment ending on top of the entity every time a
-// waypoint is passed; that one trailing entry is excluded.
+// Capped to a generous lookahead, since hand-placed routes run long. Once
+// a looping queue has rotated, its back entry is the point just left, so
+// rendering it would draw a segment ending on top of the entity every time
+// a waypoint is passed; that one trailing entry is excluded. Before the
+// first rotation, and after an edit (which re-bases loopRotation to 0),
+// the back entry is a point still to fly -- the user's newest one -- and
+// is drawn.
 //
 // Every route's geometry is gathered first and drawn in three calls total
 // -- all dashes, all front diamonds, all later diamonds -- rather than one
@@ -939,8 +942,8 @@ void DrawWaypointRoutes(World& world, const FrameView& frame) {
     for (auto& [entity, waypoint] : world.Components<WaypointComponent>()) {
         const Transform* entityTransform = transforms.TryGet(entity);
         if (waypoint.queue.empty() || entityTransform == nullptr) continue;
-        size_t effectiveCount =
-            (waypoint.loop && waypoint.queue.size() > 1) ? waypoint.queue.size() - 1 : waypoint.queue.size();
+        bool backIsJustLeft = waypoint.loop && waypoint.loopRotation > 0 && waypoint.queue.size() > 1;
+        size_t effectiveCount = backIsJustLeft ? waypoint.queue.size() - 1 : waypoint.queue.size();
         size_t renderCount = std::min(effectiveCount, kMaxRenderedWaypoints);
 
         Vec3f prev = ToVec3f(entityTransform->pos);

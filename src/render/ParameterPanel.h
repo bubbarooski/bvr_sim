@@ -27,4 +27,11 @@ bool DrawForEntity(ScenarioData& scenario, World& world, EntityID entity, double
 // with a keep-edits Reset, or the aircraft snaps back when the clock runs.
 bool TakeSetupEdit();
 
+// Puts the last "(setup)" edit back to the value it started from. For when
+// its Reset fails (a start the flight model cannot trim, such as an F-16
+// at 100 000 ft): the world was kept as it was, so the edit must go too,
+// or the panel and marker show a start the flight model never took, and
+// every later Reset fails on it.
+void RevertSetupEdit(ScenarioData& scenario, World& world);
+
 }  // namespace ParameterPanel

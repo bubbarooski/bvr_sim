@@ -609,7 +609,11 @@ void DrawScenarioSection(World& world, SimContext& simContext, SidebarState& sta
     if (ImGui::IsItemHovered()) ImGui::SetTooltip("New scenario, Save As");
     DrawScenarioFileMenu(world, simContext, state);
     if (!panel.reloadError.empty()) {
-        ImGui::TextColored(LatticeStyle::kThreat, "Failed: %s", panel.reloadError.c_str());
+        // Wrapped: a loader error names the file, key and cause, far wider
+        // than the sidebar.
+        ImGui::PushStyleColor(ImGuiCol_Text, LatticeStyle::kThreat);
+        ImGui::TextWrapped("Failed: %s", panel.reloadError.c_str());
+        ImGui::PopStyleColor();
     }
 
     {
@@ -722,6 +726,11 @@ void ApplySetupEdits(World& world, SimContext& simContext, SidebarState& state) 
     std::string name = selected.has_value() && tags.Has(*selected) ? tags.Get(*selected).name : "";
 
     ResetScenario(world, simContext, state, gScenarioPanel.reloadError);
+    if (!gScenarioPanel.reloadError.empty()) {
+        ParameterPanel::RevertSetupEdit(state.scenario, world);
+        gScenarioPanel.reloadError += " (edit undone)";
+        return;
+    }
     if (!name.empty()) {
         if (std::optional<EntityID> again = EntityLookup::FindByTagName(world, name)) {
             EntityInspector::SetSelectedEntity(*again);

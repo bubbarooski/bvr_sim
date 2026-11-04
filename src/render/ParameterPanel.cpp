@@ -23,6 +23,14 @@ using LatticeStyle::kFieldWidth;
 
 bool gSetupEdited = false;  // see TakeSetupEdit
 
+// The value a "(setup)" row held when its edit began, for RevertSetupEdit.
+struct SetupUndo {
+    const ParamRegistry::ParamDef* param = nullptr;
+    EntityID entity{};
+    double value = 0.0;
+};
+SetupUndo gSetupUndo;
+
 // Thresholds and gains span twenty orders of magnitude, so no single drag
 // widget works for all of them. Anything below this gets a scientific
 // format and a proportional drag speed instead of the entry's own step.
@@ -199,6 +207,7 @@ bool DrawRow(const ParamRegistry::ParamDef& param, ScenarioData& scenario, World
             // Edited as a double: a float shows 9.86e9 Hz as 9859999744.
             double shown = param.jsonScale.ToJson(*value);
             double widget = shown;
+            const double before = *value;
             ImGui::SetNextItemWidth(kFieldWidth);
             // AlwaysClamp so a Ctrl+Click manual entry can't push the value
             // outside the schema's declared [min, max] -- ImGui only clamps
@@ -209,6 +218,9 @@ bool DrawRow(const ParamRegistry::ParamDef& param, ScenarioData& scenario, World
                 *value = param.jsonScale.ToInternal(widget);
                 changed = true;
                 if (param.timing == ParamRegistry::ParamTiming::Setup) MoveToSpawnPose(world, entity);
+            }
+            if (param.timing == ParamRegistry::ParamTiming::Setup && ImGui::IsItemActivated()) {
+                gSetupUndo = SetupUndo{&param, entity, before};
             }
             // Once per finished edit, not every drag frame: the re-apply
             // rebuilds the flight models.
@@ -348,6 +360,15 @@ bool TakeSetupEdit() {
     bool edited = gSetupEdited;
     gSetupEdited = false;
     return edited;
+}
+
+void RevertSetupEdit(ScenarioData& scenario, World& world) {
+    if (gSetupUndo.param == nullptr) return;
+    if (double* value = gSetupUndo.param->dbl(scenario, world, gSetupUndo.entity)) {
+        *value = gSetupUndo.value;
+        MoveToSpawnPose(world, gSetupUndo.entity);
+    }
+    gSetupUndo = SetupUndo{};
 }
 
 }  // namespace ParameterPanel
