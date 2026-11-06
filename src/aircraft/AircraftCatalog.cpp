@@ -21,6 +21,7 @@ namespace {
 // (16 bits).
 constexpr int kMaxConfirmWindowFrames = 15;
 
+using TypeFileJson::RejectUnknownKeys;
 using TypeFileJson::RequireNumber;
 using TypeFileJson::RequireObject;
 using TypeFileJson::RequireString;
@@ -28,6 +29,8 @@ using TypeFileJson::RequireString;
 AircraftType Parse(const std::filesystem::path& file, const std::string& id, const std::filesystem::path& directory) {
     const std::string where = file.string();
     const nlohmann::json j = TypeFileJson::Read(file, "AircraftCatalog");
+    RejectUnknownKeys(j, where, {"name", "jsbsim_model", "geometry", "envelope", "flight_controls", "fuel", "radar",
+                                 "rwr", "signature", "notes"});
     AircraftType type;
     type.id = id;
     type.directory = directory;
@@ -35,15 +38,19 @@ AircraftType Parse(const std::filesystem::path& file, const std::string& id, con
     type.jsbsimModel = RequireString(j, "jsbsim_model", where);
 
     const nlohmann::json& geometry = RequireObject(j, "geometry", where);
+    RejectUnknownKeys(geometry, where + " geometry", {"wing_area_ft2", "hit_box_ft"});
     type.wingAreaFt2 = RequireNumber(geometry, "wing_area_ft2", where + " geometry");
     // Authored as whole dimensions, the way specifications quote them.
     const nlohmann::json& box = RequireObject(geometry, "hit_box_ft", where + " geometry");
+    RejectUnknownKeys(box, where + " hit_box_ft", {"span", "height", "length"});
     type.hitBox.halfSpanFt = 0.5 * RequireNumber(box, "span", where + " hit_box_ft");
     type.hitBox.halfHeightFt = 0.5 * RequireNumber(box, "height", where + " hit_box_ft");
     type.hitBox.halfLengthFt = 0.5 * RequireNumber(box, "length", where + " hit_box_ft");
 
     const nlohmann::json& envelope = RequireObject(j, "envelope", where);
     const std::string envelopeWhere = where + " envelope";
+    RejectUnknownKeys(envelope, envelopeWhere, {"cl_max", "cl_max_loss_per_g", "structural_g_limit_pos",
+                                                "structural_g_limit_neg", "damage_accumulation_rate"});
     type.envelope.clMax = RequireNumber(envelope, "cl_max", envelopeWhere);
     type.envelope.clMaxLossPerG = RequireNumber(envelope, "cl_max_loss_per_g", envelopeWhere);
     type.envelope.structuralGLimitPos = RequireNumber(envelope, "structural_g_limit_pos", envelopeWhere);
@@ -52,17 +59,26 @@ AircraftType Parse(const std::filesystem::path& file, const std::string& id, con
 
     const nlohmann::json& controls = RequireObject(j, "flight_controls", where);
     const std::string controlsWhere = where + " flight_controls";
+    RejectUnknownKeys(controls, controlsWhere, {"g_per_unit_stick", "military_throttle_cmd", "max_throttle_cmd"});
     type.controls.gPerUnitStick = RequireNumber(controls, "g_per_unit_stick", controlsWhere);
     type.controls.militaryThrottleCmd = RequireNumber(controls, "military_throttle_cmd", controlsWhere);
     type.controls.maxThrottleCmd = RequireNumber(controls, "max_throttle_cmd", controlsWhere);
 
     const nlohmann::json& fuel = RequireObject(j, "fuel", where);
+    RejectUnknownKeys(fuel, where + " fuel", {"internal_tank_prefix"});
     type.internalTankPrefix = RequireString(fuel, "internal_tank_prefix", where + " fuel");
 
     // Optional: a type with no fire-control radar omits it.
     if (j.contains("radar")) {
         const nlohmann::json& radar = RequireObject(j, "radar", where);
         const std::string radarWhere = where + " radar";
+        RejectUnknownKeys(radar, radarWhere,
+                          {"frame_time_s", "stt_frame_time_s", "average_power_w", "peak_power_w", "antenna_gain",
+                           "frequency_hz", "noise_figure_db", "time_on_target_s", "system_loss_db", "pfa",
+                           "confirm_frames", "confirm_window_frames", "drop_frames", "stt_drop_frames",
+                           "fire_control_delay_s", "fov_half_angle_deg", "notch_velocity_threshold_mps",
+                           "antenna_height_m", "min_range_m", "antenna_width_m", "beamwidth_factor",
+                           "monopulse_slope", "pulse_width_s", "track_maneuver_g"});
         AirborneRadarType& r = type.radar;
         r.present = true;
         r.frameTimeS = RequireNumber(radar, "frame_time_s", radarWhere);
@@ -138,6 +154,7 @@ AircraftType Parse(const std::filesystem::path& file, const std::string& id, con
     if (j.contains("rwr")) {
         const nlohmann::json& rwr = RequireObject(j, "rwr", where);
         const std::string rwrWhere = where + " rwr";
+        RejectUnknownKeys(rwr, rwrWhere, {"sensitivity_dbm", "antenna_gain", "signal_jitter_db", "sweep_period_s"});
         type.rwr.present = true;
         type.rwr.sensitivityDbm = RequireNumber(rwr, "sensitivity_dbm", rwrWhere);
         type.rwr.antennaGain = RequireNumber(rwr, "antenna_gain", rwrWhere);
@@ -159,10 +176,7 @@ AircraftType Parse(const std::filesystem::path& file, const std::string& id, con
         const nlohmann::json& signature = RequireObject(j, "signature", where);
         const std::string signatureWhere = where + " signature";
         type.signature.present = true;
-        if (signature.contains("static_rcs_m2")) {
-            throw std::runtime_error(signatureWhere + ": static_rcs_m2 is now derived from rcs_shape (the nose-on "
-                                                      "projected area; tools/fit/rcs_shape.py)");
-        }
+        RejectUnknownKeys(signature, signatureWhere, {"fluctuation_model", "rcs_shape"});
         if (!signature.contains("rcs_shape") || !signature.at("rcs_shape").is_array() ||
             signature.at("rcs_shape").empty() || signature.at("rcs_shape").size() > kMaxRcsEllipsoids) {
             throw std::runtime_error(signatureWhere + ": rcs_shape must be an array of 1-" +
@@ -170,7 +184,10 @@ AircraftType Parse(const std::filesystem::path& file, const std::string& id, con
         }
         for (const nlohmann::json& part : signature.at("rcs_shape")) {
             const std::string partWhere = signatureWhere + " rcs_shape";
+            // "part" is a label for the reader; nothing reads it.
+            RejectUnknownKeys(part, partWhere, {"part", "semi_axes_ft"});
             const nlohmann::json& axes = RequireObject(part, "semi_axes_ft", partWhere);
+            RejectUnknownKeys(axes, partWhere + " semi_axes_ft", {"span", "height", "length"});
             RcsEllipsoid& e = type.signature.shape[type.signature.shapeCount++];
             e.spanFt = RequireNumber(axes, "span", partWhere);
             e.heightFt = RequireNumber(axes, "height", partWhere);

@@ -19,6 +19,7 @@ namespace {
 // GuidanceComponent::seekerSweepHistoryBits (32 bits).
 constexpr int kMaxConfirmWindowSweeps = 31;
 
+using TypeFileJson::RejectUnknownKeys;
 using TypeFileJson::RequireNumber;
 using TypeFileJson::RequireObject;
 using TypeFileJson::RequireString;
@@ -75,6 +76,7 @@ std::shared_ptr<const MissileNormalForce> ParseNormalForce(const nlohmann::json&
                                                            const std::string& where) {
     const nlohmann::json& normalForce = RequireObject(aero, "normal_force", where);
     const std::string nfWhere = where + " normal_force";
+    RejectUnknownKeys(normalForce, nfWhere, {"alpha_max_deg", "cn_alpha_per_deg_vs_mach", "cn_max_vs_mach"});
     double alphaMaxDeg = RequireNumber(normalForce, "alpha_max_deg", nfWhere);
     if (alphaMaxDeg <= 0.0 || alphaMaxDeg > 90.0) {
         throw std::runtime_error(nfWhere + ": \"alpha_max_deg\" must be in (0, 90]");
@@ -101,6 +103,8 @@ std::shared_ptr<const MissileNormalForce> ParseNormalForce(const nlohmann::json&
 MissileType Parse(const std::filesystem::path& file, const std::string& id, const std::filesystem::path& directory) {
     const std::string where = file.string();
     const nlohmann::json j = TypeFileJson::Read(file, "MissileCatalog");
+    RejectUnknownKeys(j, where, {"name", "propulsion", "mass", "aerodynamics", "seeker", "autopilot", "loft", "fuze",
+                                 "self_destruct", "notes"});
     MissileType type;
     type.id = id;
     type.directory = directory;
@@ -108,17 +112,21 @@ MissileType Parse(const std::filesystem::path& file, const std::string& id, cons
 
     const nlohmann::json& propulsion = RequireObject(j, "propulsion", where);
     const std::string propulsionWhere = where + " propulsion";
+    RejectUnknownKeys(propulsion, propulsionWhere,
+                      {"boost_duration_s", "boost_thrust_lbf", "sustain_duration_s", "sustain_thrust_lbf"});
     type.propulsion.boostDurationS = RequireNumber(propulsion, "boost_duration_s", propulsionWhere);
     type.propulsion.boostThrustLbf = RequireNumber(propulsion, "boost_thrust_lbf", propulsionWhere);
     type.propulsion.sustainDurationS = RequireNumber(propulsion, "sustain_duration_s", propulsionWhere);
     type.propulsion.sustainThrustLbf = RequireNumber(propulsion, "sustain_thrust_lbf", propulsionWhere);
 
     const nlohmann::json& mass = RequireObject(j, "mass", where);
+    RejectUnknownKeys(mass, where + " mass", {"dry_mass_slug", "propellant_mass_slug"});
     type.mass.dryMassSlug = RequireNumber(mass, "dry_mass_slug", where + " mass");
     type.mass.propellantMassSlug = RequireNumber(mass, "propellant_mass_slug", where + " mass");
 
     const nlohmann::json& aero = RequireObject(j, "aerodynamics", where);
     const std::string aeroWhere = where + " aerodynamics";
+    RejectUnknownKeys(aero, aeroWhere, {"reference_area_ft2", "cd_vs_mach", "structural_g_limit", "normal_force"});
     type.aero.referenceAreaFt2 = RequireNumber(aero, "reference_area_ft2", aeroWhere);
     type.aero.drag = ParseDragTable(aero, aeroWhere);
     type.aero.normalForce = ParseNormalForce(aero, type.aero.referenceAreaFt2, aeroWhere);
@@ -126,11 +134,16 @@ MissileType Parse(const std::filesystem::path& file, const std::string& id, cons
 
     const nlohmann::json& seeker = RequireObject(j, "seeker", where);
     const std::string seekerWhere = where + " seeker";
+    RejectUnknownKeys(seeker, seekerWhere, {"mode", "fov_half_angle_deg", "memory_coast_time_s", "active_seeker"});
     type.seeker.mode = ParseSeekerMode(RequireString(seeker, "mode", seekerWhere), seekerWhere);
     type.seeker.fovHalfAngleDeg = RequireNumber(seeker, "fov_half_angle_deg", seekerWhere);
     type.seeker.memoryCoastTimeS = RequireNumber(seeker, "memory_coast_time_s", seekerWhere);
     const nlohmann::json& active = RequireObject(seeker, "active_seeker", seekerWhere);
     const std::string activeWhere = seekerWhere + " active_seeker";
+    RejectUnknownKeys(active, activeWhere,
+                      {"average_power_w", "antenna_gain", "frequency_hz", "noise_figure_db", "integration_time_s",
+                       "system_loss_db", "pfa", "sweep_period_s", "confirm_hits", "confirm_window",
+                       "antenna_diameter_m", "beamwidth_factor", "notch_velocity_threshold_mps"});
     type.seeker.averagePowerW = RequireNumber(active, "average_power_w", activeWhere);
     type.seeker.antennaGain = RequireNumber(active, "antenna_gain", activeWhere);
     type.seeker.frequencyHz = RequireNumber(active, "frequency_hz", activeWhere);
@@ -165,6 +178,7 @@ MissileType Parse(const std::filesystem::path& file, const std::string& id, cons
 
     // Every missile flies true PN with the gravity bias on.
     const nlohmann::json& autopilot = RequireObject(j, "autopilot", where);
+    RejectUnknownKeys(autopilot, where + " autopilot", {"response_time_s", "launch_turn_exit_deg"});
     type.autopilot.responseTimeS = RequireNumber(autopilot, "response_time_s", where + " autopilot");
     type.autopilot.launchTurnExitDeg = RequireNumber(autopilot, "launch_turn_exit_deg", where + " autopilot");
     if (type.autopilot.launchTurnExitDeg < 0.0 || type.autopilot.launchTurnExitDeg >= 180.0) {
@@ -173,6 +187,8 @@ MissileType Parse(const std::filesystem::path& file, const std::string& id, cons
 
     const nlohmann::json& loft = RequireObject(j, "loft", where);
     const std::string loftWhere = where + " loft";
+    RejectUnknownKeys(loft, loftWhere, {"start_range_nmi", "full_range_nmi", "max_climb_deg", "climb_time_constant_s",
+                                        "min_available_g"});
     type.loft.startRangeNmi = RequireNumber(loft, "start_range_nmi", loftWhere);
     type.loft.fullRangeNmi = RequireNumber(loft, "full_range_nmi", loftWhere);
     type.loft.maxClimbDeg = RequireNumber(loft, "max_climb_deg", loftWhere);
@@ -188,11 +204,13 @@ MissileType Parse(const std::filesystem::path& file, const std::string& id, cons
 
     // Metres, like the doctrine's arming_range_m override.
     const nlohmann::json& fuze = RequireObject(j, "fuze", where);
+    RejectUnknownKeys(fuze, where + " fuze", {"arming_range_m", "falloff_width_m"});
     type.fuze.armingRangeFt = RequireNumber(fuze, "arming_range_m", where + " fuze") * Units::kFeetPerMeter;
     type.fuze.falloffWidthFt = RequireNumber(fuze, "falloff_width_m", where + " fuze") * Units::kFeetPerMeter;
 
     const nlohmann::json& selfDestruct = RequireObject(j, "self_destruct", where);
     const std::string selfDestructWhere = where + " self_destruct";
+    RejectUnknownKeys(selfDestruct, selfDestructWhere, {"min_available_g", "max_time_of_flight_s"});
     type.selfDestruct.minAvailableG = RequireNumber(selfDestruct, "min_available_g", selfDestructWhere);
     type.selfDestruct.maxTimeOfFlightS = RequireNumber(selfDestruct, "max_time_of_flight_s", selfDestructWhere);
     // A floor at or above the structural cap would destroy every missile at

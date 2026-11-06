@@ -77,6 +77,48 @@ TEST(AircraftCatalog, ImpossibleTypeValuesAreRefusedNamingTheKey) {
     ExpectLoadError([](nlohmann::json& t) { t["rwr"]["signal_jitter_db"] = -1.0; }, "signal_jitter_db");
 }
 
+// A key the loader does not read is refused in every block it reads, so a
+// misspelled or leftover key cannot leave an aircraft that differs from its
+// file. Top-level "notes" is the one free-text exception.
+TEST(AircraftCatalog, AnUnknownKeyIsRefusedInEveryBlockTheLoaderReads) {
+    using nlohmann::json;
+    struct Block {
+        const char* pointer;
+        const char* expected;
+    };
+    const Block blocks[] = {
+        {"", "aircraft.json: unknown key"},
+        {"/geometry", " geometry: unknown key"},
+        {"/geometry/hit_box_ft", " hit_box_ft: unknown key"},
+        {"/envelope", " envelope: unknown key"},
+        {"/flight_controls", " flight_controls: unknown key"},
+        {"/fuel", " fuel: unknown key"},
+        {"/radar", " radar: unknown key"},
+        {"/rwr", " rwr: unknown key"},
+        {"/signature", " signature: unknown key"},
+        {"/signature/rcs_shape/0", " rcs_shape: unknown key"},
+        {"/signature/rcs_shape/0/semi_axes_ft", " semi_axes_ft: unknown key"},
+    };
+    for (const Block& block : blocks) {
+        ExpectLoadError([&](json& t) { t[json::json_pointer(block.pointer)]["bogus"] = 1; },
+                        std::string(block.expected) + " \"bogus\"");
+    }
+    // The case that matters in practice: a misspelled optional block would
+    // otherwise load as a type with no radar warning receiver.
+    ExpectLoadError(
+        [](json& t) {
+            t["rwrr"] = t["rwr"];
+            t.erase("rwr");
+        },
+        "unknown key \"rwrr\"");
+    {
+        json t = RealF16Type();
+        t["notes"]["anything"] = "free text";
+        ScratchCatalog scratch(t.dump());
+        EXPECT_NO_THROW(AircraftCatalog(scratch.Root()).Get("test_type"));
+    }
+}
+
 // A type id names one directory under the catalog root. A path that climbs
 // out of it, or replaces it, would load an unrelated file as a type.
 TEST(AircraftCatalog, AnIdThatIsNotOneDirectoryNameIsRefused) {
@@ -240,9 +282,15 @@ TEST(AircraftCatalog, SignatureNeedsAShapeNotAStaticRcs) {
         EXPECT_NEAR(signature.staticRcsM2, 3.14159265358979 * 2.0 * 3.0 * 0.3048 * 0.3048, 1e-9);
     }
     {
+        // The RCS comes from the shape; a stated value would be a second, conflicting source.
         ScratchCatalog scratch(typeWith(R"({"static_rcs_m2": 5, "fluctuation_model": "swerling_1", "rcs_shape": [)" +
                                         part + "]}"));
-        EXPECT_THROW(AircraftCatalog(scratch.Root()).Get("test_type"), std::runtime_error);
+        try {
+            AircraftCatalog(scratch.Root()).Get("test_type");
+            ADD_FAILURE() << "expected static_rcs_m2 to be refused";
+        } catch (const std::runtime_error& e) {
+            EXPECT_NE(std::string(e.what()).find("unknown key \"static_rcs_m2\""), std::string::npos) << e.what();
+        }
     }
     {
         ScratchCatalog scratch(typeWith(R"({"fluctuation_model": "swerling_1"})"));

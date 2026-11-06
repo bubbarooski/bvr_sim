@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <initializer_list>
 #include <stdexcept>
 #include <string>
 
@@ -49,6 +50,23 @@ inline const nlohmann::json& RequireObject(const nlohmann::json& block, const ch
         throw std::runtime_error(where + ": missing \"" + key + "\" block");
     }
     return block.at(key);
+}
+
+// Every key of `block` must be one the catalog reads, so a misspelled
+// optional block ("rwrr") or a key the loader no longer reads fails at load
+// instead of being ignored while the type flies on without it. The one
+// free-text key, top-level "notes", is listed by the caller; its contents
+// are not walked.
+inline void RejectUnknownKeys(const nlohmann::json& block, const std::string& where,
+                              std::initializer_list<const char*> allowed) {
+    if (!block.is_object()) return;
+    for (auto it = block.begin(); it != block.end(); ++it) {
+        bool known = false;
+        for (const char* key : allowed) known = known || it.key() == key;
+        if (!known) {
+            throw std::runtime_error(where + ": unknown key \"" + it.key() + "\" (docs/SCHEMA.md lists the keys)");
+        }
+    }
 }
 
 }  // namespace TypeFileJson

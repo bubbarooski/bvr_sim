@@ -257,6 +257,41 @@ TEST(MissileCatalog, EachRejectedValueSaysWhy) {
                     "\"start_range_nmi\" < \"full_range_nmi\"");
 }
 
+// A key the loader does not read is refused in every block it reads, so a
+// misspelled or leftover key cannot leave a missile that differs from its
+// file. Top-level "notes" is the one free-text exception.
+TEST(MissileCatalog, AnUnknownKeyIsRefusedInEveryBlockTheLoaderReads) {
+    using nlohmann::json;
+    struct Block {
+        const char* pointer;
+        const char* expected;
+    };
+    // The leading space keeps " seeker:" from matching " active_seeker:".
+    const Block blocks[] = {
+        {"", "missile.json: unknown key"},
+        {"/propulsion", " propulsion: unknown key"},
+        {"/mass", " mass: unknown key"},
+        {"/aerodynamics", " aerodynamics: unknown key"},
+        {"/aerodynamics/normal_force", " normal_force: unknown key"},
+        {"/seeker", " seeker: unknown key"},
+        {"/seeker/active_seeker", " active_seeker: unknown key"},
+        {"/autopilot", " autopilot: unknown key"},
+        {"/loft", " loft: unknown key"},
+        {"/fuze", " fuze: unknown key"},
+        {"/self_destruct", " self_destruct: unknown key"},
+    };
+    for (const Block& block : blocks) {
+        ExpectLoadError([&](json& t) { t[json::json_pointer(block.pointer)]["bogus"] = 1; },
+                        std::string(block.expected) + " \"bogus\"");
+    }
+    {
+        json t = RealAim120Type();
+        t["notes"]["anything"] = "free text";
+        ScratchCatalog scratch(t.dump());
+        EXPECT_NO_THROW(MissileCatalog(scratch.Root()).Get("test_type"));
+    }
+}
+
 // The launch-zone table is generated from missile.json; an edit to the type
 // file without regenerating it marks the table stale (and warns).
 TEST(MissileCatalog, EditedTypeFileMarksTheLaunchZoneStale) {

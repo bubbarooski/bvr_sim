@@ -258,8 +258,10 @@ coin flip at 10 nmi, in free space.
 Not part of a scenario: one file per missile type, shared by every
 scenario that names it. Adding a missile is adding a directory here.
 Every field is required; a missing or out-of-range one fails the
-scenario load naming the file. English units, except the fuze's
-arming range (metres, like the doctrine field it backs).
+scenario load naming the file, and so does a key the loader does not
+read (a misspelling never loads as a different missile), `notes`
+excepted. English units, except the fuze's arming range (metres, like
+the doctrine field it backs).
 
 | Field | Unit | Meaning |
 |---|---|---|
@@ -369,8 +371,10 @@ type's, so a scenario stays free of copies of type data.
 Not part of a scenario: one file per aircraft type, shared by every
 scenario that names it. Adding an aircraft is adding a directory here
 (plus its JSBSim model under `data/jsbsim_data/`). Every field is
-required; a missing or out-of-range one fails the scenario load naming
-the file.
+required, except the optional `radar`, `rwr` and `signature` blocks; a
+missing or out-of-range one fails the scenario load naming the file, and
+so does a key the loader does not read (a misspelled `rwr` never loads
+as an aircraft with no warning receiver), `notes` excepted.
 
 | Field | Unit | Meaning |
 |---|---|---|
