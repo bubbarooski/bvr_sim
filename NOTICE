@@ -42,6 +42,13 @@ files are NOT covered by the Apache License above:
 
 engine/direct.xml is original to this project (Apache 2.0).
 
-Fonts copied into the build output at fonts/ (Roboto-Medium.ttf,
-Cousine-Regular.ttf) are redistributed from the Dear ImGui repository under
-their respective open-source licenses (Apache 2.0 / Bitstream Vera-derived).
+Fonts copied into the build output at fonts/ are redistributed from the
+Dear ImGui repository (deps/imgui/misc/fonts/) under their own licenses:
+
+  Roboto-Medium.ttf   -- Christian Robertson. Apache License 2.0
+                         https://fonts.google.com/specimen/Roboto
+  Cousine-Regular.ttf -- Steve Matteson. SIL Open Font License 1.1
+                         https://fonts.google.com/specimen/Cousine
+
+A binary distribution that includes fonts/ should ship these two license
+texts with it.

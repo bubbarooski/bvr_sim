@@ -790,7 +790,7 @@ void DrawEntityMarkers(World& world, const FrameView& frame) {
     UseMarkerProgram(frame);
     for (auto& [entity, transform] : world.Components<Transform>()) {
         // A destroyed entity's marker goes muted grey; its trail keeps its
-        // own color (GUI_DESIGN - Entity markers).
+        // own color.
         SetColor(destroyed.Has(entity) ? LatticeStyle::kTextSecondary : EntityColor(kinematicsComponents, tags, entity),
                  1.0f);
         Vec3f worldPos = ToVec3f(transform.pos);

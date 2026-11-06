@@ -102,8 +102,8 @@ void DrawLiveFields(World& world, const SimContext& simContext, EntityID entity,
         ImGui::Text("%s", modeLabel);
         // Once the engagement has resolved, the phase and lock fields only
         // hold their last values; show what became of the missile instead.
-        // Muted grey: no guidance tier any more (GUI_DESIGN - Sensor tier
-        // color code, NONE).
+        // Muted grey, the NONE sensor-tier color: a resolved missile has no
+        // guidance tier.
         if (guidance.launched && !guidance.active) {
             bool destroyed = world.Components<DestroyedComponent>().Has(entity);
             LatticeStyle::TextBoldColored(LatticeStyle::kTextSecondary, "  Status:");
