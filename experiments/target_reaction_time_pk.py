@@ -24,8 +24,8 @@ finds each seed's launch time, and that seed's turn is set from it.
 
 Measured 2026-11-10 (49 reaction times x 40 seeds per shot):
 
-  shot             time of flight   Pk 0.5 when the     i.e. this long
-                   (straight target) target turns at    before arrival
+  shot             median time of   Pk 0.5 when the     i.e. this long
+                   flight (straight) target turns at    before arrival
   45 nmi, lofted        91 s             60 s               31 s
   45 nmi, flat         105 s            103 s                2 s
   28 nmi, lofted        51 s             14 s               37 s
@@ -40,6 +40,9 @@ Measured 2026-11-10 (49 reaction times x 40 seeds per shot):
   decides the launch range (38-47 nmi for the "45 nmi" shot), and the
   shots that win against a mid-flight turn are the shorter ones. The
   28 nmi shot always waits for the same range, so its rise is sharp.
+- The flat shot's arrival ranges from 82 to 118 s with its launch range,
+  so its curve keeps climbing past the median arrival: each later turn
+  lets one more long, slow shot arrive first.
 
 The numbers illustrate the physics of this model; they do not predict a
 real missile's performance.
@@ -169,7 +172,8 @@ def summarise(df):
                 launched=("launched", "mean"), pk=("hit", "mean"))
     out["se"] = (out.pk * (1 - out.pk) / out.runs).map(math.sqrt)
     # At the latest level the Target is still flying straight when the
-    # missile arrives: that level's time of flight is the shot's own.
+    # missile arrives. Flight time varies with the seed's launch range, so
+    # this is the median: a slower shot can still be in the air after it.
     last = df[(df.level_s == df.level_s.max()) & (df.hit == 1)]
     out["flight_time_s"] = (last.resolution_time_s - last.launch_time_s).median()
     return out.reset_index()
@@ -216,7 +220,7 @@ def plot(curves, path):
                     ha="right" if left else "left", va="center", fontsize=9.5, color=ink)
 
     first_arrival = min(s.flight_time_s.iloc[0] for s in curves.values())
-    ax.annotate("missile arrives, if the target never turns", (first_arrival, 1.06), xytext=(9, 0),
+    ax.annotate("median arrival, if the target never turns", (first_arrival, 1.06), xytext=(9, 0),
                 textcoords="offset points", ha="left", va="center", fontsize=8.5, color=ink_3,
                 annotation_clip=False)
 
@@ -282,7 +286,7 @@ def main():
         print(f"{'reaction s':>10} {'runs':>5} {'launched':>9} {'Pk':>6} {'+/-':>6}")
         for row in s.itertuples():
             print(f"{row.reaction_s:>10.1f} {row.runs:>5} {row.launched:>8.0%} {row.pk:>6.2f} {row.se:>6.2f}")
-        print(f"time of flight if the Target never turns: {s.flight_time_s.iloc[0]:.1f} s")
+        print(f"median time of flight if the Target never turns: {s.flight_time_s.iloc[0]:.1f} s")
         rng = launched.launch_range_m / 1852.0
         print(f"launch range: median {rng.median():.1f} nmi, {rng.min():.1f}-{rng.max():.1f} across seeds")
 
