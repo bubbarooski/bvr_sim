@@ -1,6 +1,6 @@
 #pragma once
 
-// What the viewer shows, chosen in the sidebar's Settings popup and saved
+// What the viewer shows, chosen in the Settings window and saved
 // beside the executable with ImGui's window layout (imgui.ini). Display
 // only: nothing here is simulated or written to a scenario.
 struct ViewSettings {

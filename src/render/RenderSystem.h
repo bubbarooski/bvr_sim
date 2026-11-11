@@ -40,7 +40,7 @@ struct RenderOptions {
     // spent paused.
     bool paused = false;
 
-    // What to draw (the viewer's Settings popup).
+    // What to draw (the viewer's Settings window).
     ViewSettings view;
 
     // An index into the selected entity's waypoint queue: draws a vertical

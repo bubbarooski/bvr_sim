@@ -1212,8 +1212,16 @@ void SettingCheckbox(const char* label, bool* value, const char* tooltip = nullp
     if (tooltip != nullptr && ImGui::IsItemHovered()) ImGui::SetTooltip("%s", tooltip);
 }
 
-void DrawSettingsPopup() {
-    if (!ImGui::BeginPopup("Settings")) return;
+// A centred modal with a close X; Esc closes it too. While it is open
+// ImGui reports WantCaptureKeyboard, so the sim shortcuts are inert.
+void DrawSettingsWindow() {
+    ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+    bool open = true;
+    if (!ImGui::BeginPopupModal("Settings", &open,
+                                ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings)) {
+        return;
+    }
+    if (ImGui::IsKeyPressed(ImGuiKey_Escape, /*repeat=*/false)) ImGui::CloseCurrentPopup();
     ViewSettings& settings = ViewSettingsStore::Get();
 
     LatticeStyle::TextBold("Display");
@@ -1288,7 +1296,7 @@ bool GearButton(const char* id) {
 void DrawTopBar() {
     if (GearButton("##settings")) ImGui::OpenPopup("Settings");
     if (ImGui::IsItemHovered()) ImGui::SetTooltip("Settings");
-    DrawSettingsPopup();
+    DrawSettingsWindow();
     ImGui::SameLine();
     if (ImGui::Button("?")) gShowShortcuts = !gShowShortcuts;
     if (ImGui::IsItemHovered()) ImGui::SetTooltip("Keyboard shortcuts (?)");
