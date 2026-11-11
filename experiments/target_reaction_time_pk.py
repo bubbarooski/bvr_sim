@@ -195,10 +195,16 @@ def plot(curves, path):
 
     handles = []
     for (label, s), colour in zip(curves.items(), colours):
+        flight = s.flight_time_s.iloc[0]
+        before = s[s.reaction_s <= flight]
+        if len(before) and before.pk.iloc[-1] == 1.0:
+            # Already certain by the time it arrives: a later turn changes nothing, so the line ends there.
+            s = pd.concat([before, pd.DataFrame({"reaction_s": [flight], "pk": [1.0], "se": [0.0]})],
+                          ignore_index=True)
         x, pk, se = s.reaction_s, s.pk, s.se
         ax.fill_between(x, (pk - se).clip(0, 1), (pk + se).clip(0, 1), color=colour, alpha=0.12, lw=0)
         ax.plot(x, pk, color=colour, lw=2.2, solid_capstyle="round", solid_joinstyle="round")
-        ax.plot(s.flight_time_s.iloc[0], 1.06, marker="v", ms=7, color=colour, mec=surface, mew=1,
+        ax.plot(flight, 1.06, marker="v", ms=7, color=colour, mec=surface, mew=1,
                 clip_on=False, zorder=5)
         handles.append(Line2D([], [], color=colour, lw=2.2, label=label))
 
