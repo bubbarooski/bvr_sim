@@ -20,25 +20,24 @@ the sweep reports both:
 It runs on two geometries, head-on (1_core_01_first_shot) and a crossing
 target that breaks away (2_combined_04_crossing_break).
 
-The figures below were measured on scenario_basic and the
-plain, unbroken scenario_crossing; rerun to refresh them for the current
-pair. Measured 2026-10-28 (5 levels x 120 seeds per geometry; TWS frames, loft):
+Measured 2026-11-10 (5 levels x 120 seeds per geometry; TWS frames, loft):
 
-  ref nmi        25     35     50     70    100
-  head-on  launch 22.3   33.1   44.8   46.8   46.8 nmi  err p50 324 431 342 226 138 m
-  crossing launch 32.0   33.3   33.3   33.3   33.3 nmi  err p50 429 273 161 109  76 m
+  ref nmi          25     35     50     70    100
+  head-on  launch 22.3   33.1   44.8   46.8   46.8 nmi  err p50 311 467 372 278 188 m
+  crossing launch 32.0   33.3   33.3   33.3   33.3 nmi  err p50 403 266 212 120  84 m
 
 - Head-on, sensitivity buys launch range almost in proportion until the
   launch zone caps the shot near 47 nmi; only past the cap does it go into
   the track.
 - Crossing, the launch range is capped from 35 nmi up, so the extra
   sensitivity goes into the track instead: the handoff error falls
-  429 -> 76 m.
-- Every launched run acquired and Pk stays ~0.86-0.97 (lethality rolls):
-  a midcourse missile steers on the datalink with no gimbal limit
-  (REFERENCE.md 8.1), so track errors of this size never decide the shot.
-  What radar sensitivity buys here is an earlier shot or a better track,
-  not a higher Pk.
+  403 -> 84 m.
+- Every launched run acquired, at every level, and Pk does not move with
+  sensitivity: 1.00 head-on, 0.00 crossing, where the break turns the shot
+  into a tail chase the burned-out missile cannot win. A midcourse missile
+  steers on the datalink with no gimbal limit (REFERENCE.md 8.1), so track
+  errors of this size never decide the shot. What radar sensitivity buys
+  is an earlier shot or a better track, not a higher Pk.
 - The errors are several times the 54-73 m a once-a-second track update
   would give: the track updates once per 4.4 s scan frame.
 

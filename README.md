@@ -222,8 +222,22 @@ python experiments/_template.py
 
 `experiments/_template.py` is a heavily commented, runnable sweep of
 missile kill radius vs. kill probability; copy it to ask your own
-question. `datalink_quality_pk.py` is a fuller worked example. Output lands in
-`experiments/results/` (gitignored).
+question. `datalink_quality_pk.py` and `target_reaction_time_pk.py` are
+fuller worked examples. Output lands in `experiments/results/` (gitignored).
+
+`target_reaction_time_pk.py` asks how long a target can wait before it
+turns and runs. It moves the turn along the target's route so that it
+comes a set number of seconds after the launch, and plots Pk against that
+time for a 45 nmi shot with and without loft, and for a 28 nmi shot:
+
+![Kill probability against how many seconds after launch the target turns and runs, for three shots](docs/images/reaction-time-pk.png)
+
+Lofted, the 45 nmi shot is beaten by a turn in its first minute, about
+half a minute before it would arrive. Flown flat, it is beaten by a turn
+almost up to the moment of arrival. Holding fire to 28 nmi cuts the
+target's window to about 14 s. The spread in each rise comes from the
+dice: when the radar confirms its track sets the launch range, and the
+shorter shots are the ones that survive a mid-flight turn.
 
 To drive the runner directly, write a spec:
 
@@ -270,7 +284,6 @@ ctest --test-dir build -C Release --output-on-failure
 | --- | --- |
 | `unit_tests` | Pure logic: atmosphere, drag tables, vector/matrix math, camera projection and picking, intercept scoring, track table, parameter registry, event log |
 | `validation_tests` | Whole-pipeline checks: missile integration vs exact kinematics, radar equation, PN guidance and missile propulsion/drag/mass/envelope, F-16 kinematic identities and stability, radar confirmation/notch/FOV gating, save/load round-trips and reset determinism, the `intercept_batch` command line (job-count determinism, CSV output, error handling), plus a sanity sweep over every teaching scenario |
-
 | `PythonTools` | `tests/python/`: the experiment framework's pointer helper and error handling, the `batch_compare` regression gate (`--identical` must not call different work identical), and `clean.py`'s deletion rules. Skips what needs pandas or a built `intercept_batch` |
 
 `real_world_validation` and `perf_benchmark` also build. They are
