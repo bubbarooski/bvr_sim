@@ -53,6 +53,7 @@ Run from anywhere:  python experiments/target_reaction_time_pk.py
 
 import argparse
 import json
+import logging
 import math
 import sys
 from pathlib import Path
@@ -178,47 +179,67 @@ def plot(curves, path):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
+    from matplotlib.ticker import MultipleLocator, PercentFormatter
 
     # Reference categorical slots 1-3 (validated as a set), light surface.
-    surface, ink, ink_2, grid = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
+    surface, ink, ink_2, ink_3, rule = "#fcfcfb", "#1a1a19", "#52514e", "#8a8984", "#e6e5e1"
     colours = ["#2a78d6", "#eb6834", "#1baf7a"]
+    logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)  # a missing fallback font is fine
+    plt.rcParams["font.family"] = ["Segoe UI", "Helvetica Neue", "Arial", "DejaVu Sans"]
 
-    fig, ax = plt.subplots(figsize=(8.0, 4.6), dpi=150)
+    fig, ax = plt.subplots(figsize=(9.0, 5.2), dpi=200)
     fig.patch.set_facecolor(surface)
     ax.set_facecolor(surface)
+    fig.subplots_adjust(left=0.08, right=0.97, top=0.76, bottom=0.15)
+
+    handles = []
     for (label, s), colour in zip(curves.items(), colours):
         x, pk, se = s.reaction_s, s.pk, s.se
-        ax.fill_between(x, (pk - se).clip(0, 1), (pk + se).clip(0, 1), color=colour, alpha=0.15, lw=0)
-        ax.plot(x, pk, color=colour, lw=2, label=label)
-        flight = s.flight_time_s.iloc[0]
-        ax.plot(flight, 1.045, marker="v", ms=8, color=colour, mec=surface, mew=1, clip_on=False)
-        # Direct label beside where the curve first reaches 0.5, on the side with room.
-        mid = s[s.pk >= 0.5].iloc[0] if (s.pk >= 0.5).any() else s.iloc[-1]
-        left = mid.reaction_s > 30
-        ax.annotate(label, (mid.reaction_s, 0.5), xytext=(-8 if left else 8, 0), textcoords="offset points",
-                    ha="right" if left else "left", va="center", fontsize=9, color=ink)
+        ax.fill_between(x, (pk - se).clip(0, 1), (pk + se).clip(0, 1), color=colour, alpha=0.12, lw=0)
+        ax.plot(x, pk, color=colour, lw=2.2, solid_capstyle="round", solid_joinstyle="round")
+        ax.plot(s.flight_time_s.iloc[0], 1.06, marker="v", ms=7, color=colour, mec=surface, mew=1,
+                clip_on=False, zorder=5)
+        handles.append(Line2D([], [], color=colour, lw=2.2, label=label))
 
-    ax.set_xlim(-2, max(REACTION_S) + 4)
-    ax.set_ylim(-0.03, 1.07)
-    ax.set_xlabel("Target turns and runs this many seconds after launch", color=ink_2)
-    ax.set_ylabel("Kill probability", color=ink_2)
-    ax.set_title("A later turn gives the missile the kill; loft and a shorter shot shrink the window",
-                 loc="left", fontsize=11, color=ink, pad=12)
-    ax.grid(axis="y", color=grid, lw=0.8)
+        # Direct label beside the curve where it crosses 50 %, on the side with room.
+        i = int((pk >= 0.5).to_numpy().argmax())
+        x50 = x[i] if i == 0 else x[i - 1] + (0.5 - pk[i - 1]) / (pk[i] - pk[i - 1]) * (x[i] - x[i - 1])
+        left = x50 > 30
+        ax.annotate(label, (x50, 0.5), xytext=(-10 if left else 10, 0), textcoords="offset points",
+                    ha="right" if left else "left", va="center", fontsize=9.5, color=ink)
+
+    first_arrival = min(s.flight_time_s.iloc[0] for s in curves.values())
+    ax.annotate("missile arrives, if the target never turns", (first_arrival, 1.06), xytext=(9, 0),
+                textcoords="offset points", ha="left", va="center", fontsize=8.5, color=ink_3,
+                annotation_clip=False)
+
+    ax.set_xlim(0, max(REACTION_S))
+    ax.set_ylim(-0.02, 1.02)
+    ax.margins(x=0)
+    ax.xaxis.set_major_locator(MultipleLocator(20))
+    ax.yaxis.set_major_locator(MultipleLocator(0.25))
+    ax.yaxis.set_major_formatter(PercentFormatter(1.0, decimals=0))
+    ax.set_xlabel("Seconds after launch when the target turns and runs", color=ink_2, fontsize=10, labelpad=8)
+    ax.set_ylabel("Kill probability", color=ink_2, fontsize=10, labelpad=8)
+    ax.grid(axis="y", color=rule, lw=0.8)
+    ax.axhline(0, color=ink_3, lw=0.8, zorder=0.5)
     ax.set_axisbelow(True)
-    for side in ("top", "right"):
+    for side in ("top", "right", "left"):
         ax.spines[side].set_visible(False)
-    for side in ("left", "bottom"):
-        ax.spines[side].set_color(grid)
-    ax.tick_params(colors=ink_2, length=0)
-    legend = ax.legend(loc="lower right", frameon=False, fontsize=9)
-    for text in legend.get_texts():
-        text.set_color(ink)
-    fig.text(0.01, 0.01, f"1_core_04_loft, {SEEDS_PER_LEVEL} seeds per point, band = ±1 standard error; "
-             "▼ = the shot's time of flight if the target never turns.\n"
-             "Illustrates this model's physics; not a prediction of real performance.",
-             fontsize=7.5, color=ink_2)
-    fig.tight_layout(rect=(0, 0.05, 1, 1))
+    ax.spines["bottom"].set_visible(False)
+    ax.tick_params(colors=ink_2, labelsize=9, length=0, pad=6)
+
+    fig.text(0.08, 0.95, "The later the target turns, the surer the kill", fontsize=14, fontweight="semibold",
+             color=ink, ha="left", va="top")
+    fig.text(0.08, 0.895, "Loft and a shorter shot both shrink the time the target has to get away",
+             fontsize=10.5, color=ink_2, ha="left", va="top")
+    fig.legend(handles=handles, loc="upper left", bbox_to_anchor=(0.075, 0.855), ncol=len(handles),
+               frameon=False, fontsize=9, labelcolor=ink_2, handlelength=1.8, columnspacing=1.6,
+               handletextpad=0.6)
+    fig.text(0.08, 0.025, f"1_core_04_loft, {SEEDS_PER_LEVEL} seeds per point; shading is ±1 standard "
+             "error. Illustrates this model's physics, not real-world performance.",
+             fontsize=8, color=ink_3, ha="left", va="bottom")
     fig.savefig(path, facecolor=surface)
     plt.close(fig)
 
