@@ -15,6 +15,7 @@ Run from anywhere:  python experiments/_template.py
 
 A real, fuller example once this one makes sense:
   datalink_quality_pk.py  -- the same sweep run across two geometries
+  target_reaction_time_pk.py -- a sweep that moves a route point, and plots Pk
 """
 
 import sys
