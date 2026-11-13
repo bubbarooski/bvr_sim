@@ -2175,7 +2175,7 @@ jitter on top of a steady target.
 
 ## 9.3 Pulse-Doppler clutter notch
 
-![A target beaming the radar: the cone touching the ground and the track dropped](images/notch-beam.png)
+![A low target beaming the missile: the seeker cone looks down onto the ground and the event log shows SEEKER_LOST doppler_notch](images/notch-beam.png)
 
 A pulse-Doppler radar cannot distinguish a target whose Doppler shift
 falls inside the main-lobe ground-clutter return from the clutter itself.

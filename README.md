@@ -44,7 +44,7 @@ result, then change one setting and see how that probability moves. A
 6-core desktop, and gives bit-identical results at any thread count
 ([Monte Carlo](#running-a-batch-monte-carlo)).
 
-![Terminal output of a kill-radius sweep: kill probability at each level](docs/images/mc-sweep.png)
+![Terminal output of a launch-range sweep: kill probability at each level](docs/images/mc-sweep.png)
 
 **What it isn't.** Not a validated model of any real aircraft, missile or
 radar: their real performance is not public, and the published figures
@@ -221,8 +221,8 @@ python experiments/_template.py
 ```
 
 `experiments/_template.py` is a heavily commented, runnable sweep of
-missile kill radius vs. kill probability; copy it to ask your own
-question. `datalink_quality_pk.py` and `target_reaction_time_pk.py` are
+launch range against kill probability on the notch scenario; copy it to
+ask your own question. `datalink_quality_pk.py` and `target_reaction_time_pk.py` are
 fuller worked examples. Output lands in `experiments/results/` (gitignored).
 
 `target_reaction_time_pk.py` asks how long a target can wait before it

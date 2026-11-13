@@ -2,8 +2,8 @@
 
 An experiment answers one question by running the sim many times with one
 parameter varied and comparing the outcomes. This file runs end to end as
-written -- a small sweep of the missile's kill radius against
-1_core_01_first_shot.json -- so you can execute it once to see the whole
+written -- a sweep of launch range fraction against
+1_core_08_notch.json -- so you can execute it once to see the whole
 pipeline work, then edit the marked sections to ask your own question.
 
 Before running:
@@ -34,10 +34,10 @@ from _framework import dot_to_pointer, grid_runs, load_results, run_batch
 # ============================================================================
 
 # Any scenario file -- the numbered teaching set under scenarios/, or your
-# own under scenarios/custom/. 1_core_01_first_shot.json is a reasonable
-# default: a plain head-on F-16-vs-F-16 intercept with the full
-# radar/missile chain.
-SCENARIO = "scenarios/1_core_01_first_shot.json"
+# own under scenarios/custom/. 1_core_08_notch.json is a head-on shot
+# where the Target beams the radar after launch, so the outcome depends
+# on how the shot is taken -- a good place to see Pk move.
+SCENARIO = "scenarios/1_core_08_notch.json"
 
 # How many random seeds to run at EACH level of the swept parameter. Every
 # run at a given level is otherwise identical -- the seed is the only
@@ -47,20 +47,25 @@ SCENARIO = "scenarios/1_core_01_first_shot.json"
 # trend; 250 here gives a Pk estimate good to about +/-3 points per level.
 SEEDS = 250
 
-# The parameter to vary, and the values to try. This example sweeps the
-# missile's kill_radius_m -- the proximity-fuze radius lethality is
-# evaluated at. Pk is a logistic curve centered on this value (see
-# REFERENCE.md, InterceptSystem's Pk(missDistance, killRadius,
-# falloffWidth)), so widening it should produce a clean, monotonically
-# increasing Pk with no surprises -- a safe first sweep to learn the
-# pipeline on. The scenario's own default is 12.0.
+# The parameter to vary, and the values to try. This example sweeps
+# launch_range_fraction -- the Pursuer fires once the target is inside
+# this fraction of the launch zone's maximum range (1.0 = at Rmax). A
+# closer shot reaches the target sooner after it turns to beam, so the
+# seeker has a better chance of holding it through the notch: Pk falls as
+# the fraction rises. Below 0.5 the Target turns before the range closes
+# that far and no shot is taken (runs without a launch are dropped below).
+# The scenario's own value is 0.6.
+#
+# Not every knob moves Pk. Kill radius barely does: a guided missile
+# either hits within a metre or two or misses by hundreds, so widening
+# the lethal radius from 2 to 20 m changes almost no outcome.
 #
 # HOW TO FIND YOUR OWN PARAMETER PATH:
 #   - docs/SCHEMA.md is the authoring reference: every scenario JSON key,
 #     its unit, and its default.
 #   - Write the path the way you'd address it in the JSON, with dots
-#     between levels: "missile_doctrine.kill_radius_m" reaches
-#     {"missile_doctrine": {"kill_radius_m": ...}}.
+#     between levels: "missile_doctrine.launch_range_fraction" reaches
+#     {"missile_doctrine": {"launch_range_fraction": ...}}.
 #   - Per-entity fields need an array index, e.g.
 #     "entities[1].components.jsbsim.airspeed_kts" for the
 #     SECOND entity in the scenario's "entities" array (0-indexed) --
@@ -72,8 +77,8 @@ SEEDS = 250
 #     to be a field the GUI exposes. A SCHEMA.md key the file leaves at
 #     its default works too. Anything else (a typo) stops the batch with
 #     an error before any run starts.
-LEVELS = [2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0]
-PARAM_POINTER = dot_to_pointer("missile_doctrine.kill_radius_m")
+LEVELS = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+PARAM_POINTER = dot_to_pointer("missile_doctrine.launch_range_fraction")
 
 
 # ============================================================================
@@ -114,7 +119,7 @@ def main():
     # against it, and returns the path to the results CSV it wrote.
     # name= just controls the output filename under experiments/results/
     # (gitignored -- delete it or regenerate anytime by rerunning this).
-    results_path = run_batch(SCENARIO, runs, name="template_kill_radius")
+    results_path = run_batch(SCENARIO, runs, name="template_launch_range")
 
     # load_results reads that CSV into a pandas DataFrame, one row per
     # run. Columns that always exist (src/batch/BatchMain.cpp's
@@ -136,7 +141,7 @@ def main():
     #   error                        exception text, if the run raised in C++
     #
     # Plus one column per override key you swept, named after its last
-    # path segment ("kill_radius_m" here).
+    # path segment ("launch_range_fraction" here).
     df = load_results(results_path)
 
     # Bail loudly on a bad sweep rather than silently computing Pk over
@@ -154,11 +159,11 @@ def main():
     # part every experiment is really about -- everything above is just
     # getting a DataFrame to do this with. Group by whatever you swept;
     # print or plot whatever answers your question.
-    print(f"\n{'kill_radius_m':>13} {'runs':>5} {'Pk':>7}")
+    print(f"\n{'launch_range_fraction':>21} {'runs':>5} {'Pk':>7}")
     for level in LEVELS:
-        cell = df[df.kill_radius_m == level]
+        cell = df[df.launch_range_fraction == level]
         pk = cell.hit.mean() if len(cell) else float("nan")
-        print(f"{level:>13.1f} {len(cell):>5} {pk:>7.3f}")
+        print(f"{level:>21.1f} {len(cell):>5} {pk:>7.3f}")
 
     # For anything the wide table doesn't carry -- WHY a run ended a
     # particular way, not just that it did -- load_events() reads the
