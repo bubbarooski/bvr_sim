@@ -160,7 +160,10 @@ Reload. The sidebar holds the scenario (its File popup has **New
 Scenario** and **Save As**), the parameter editor, telemetry, the event
 log and the entity inspector; the gear at its top opens Settings (what
 the 3D view draws, which panels show, cone opacity, and Advanced mode,
-which adds the finer knobs and each type's own values). While paused,
+which adds the finer knobs and each type's own values). Ticks on the
+trails mark where events happened (radar track and lock, launch, the
+target's radar warnings, the missile's seeker going active); hover one for
+what and when. While paused,
 **Waypoint Placement Mode** lets you click to add waypoints for the
 selected aircraft, drag a waypoint vertically to change its altitude, and
 right-click one to delete it and every point after it.

@@ -427,6 +427,23 @@ float ViewNdcShiftX() {
     return displayWidth > 0.0f ? -Sidebar::Width() / displayWidth : 0.0f;
 }
 
+// The tooltip of the event ticks under the cursor, with the projection
+// picking uses.
+void ShowEventMarkTooltip(GLFWwindow* window, const Camera& camera, float viewNdcShiftX) {
+    if (ImGui::GetIO().WantCaptureMouse) return;
+    int viewportW = 0, viewportH = 0;
+    glfwGetWindowSize(window, &viewportW, &viewportH);
+    if (viewportW <= 0 || viewportH <= 0) return;
+    Mat4 viewProj = Camera::ProjectionMatrix(static_cast<float>(viewportW) / static_cast<float>(viewportH),
+                                             viewNdcShiftX) *
+                    camera.ViewMatrix();
+    double mouseX = 0.0, mouseY = 0.0;
+    glfwGetCursorPos(window, &mouseX, &mouseY);
+    std::string labels = RenderSystem::HoveredEventMarks(viewProj, viewportW, viewportH, static_cast<float>(mouseX),
+                                                         static_cast<float>(mouseY));
+    if (!labels.empty()) ImGui::SetTooltip("%s", labels.c_str());
+}
+
 // Where the grabbed waypoint sits on screen, for anchoring its edit panel.
 struct WaypointScreenAnchor {
     bool valid = false;
@@ -631,6 +648,7 @@ int main(int argc, char** argv) {
                                    ui.centerOnSelectedEntity,
                                    camera.distance};
         Sidebar::Draw(world, simContext, sidebarState);
+        ShowEventMarkTooltip(window, camera, viewNdcShiftX);
 
         ImGui::Render();
 
@@ -643,6 +661,7 @@ int main(int argc, char** argv) {
 
         RenderSystem::RenderOptions renderOptions;
         renderOptions.paused = simClock.Paused();
+        renderOptions.simTime = simTime;
         renderOptions.view = ViewSettingsStore::Get();
         renderOptions.selectedWaypointIndex = ui.selectedWaypointIndex;
         renderOptions.viewNdcShiftX = viewNdcShiftX;

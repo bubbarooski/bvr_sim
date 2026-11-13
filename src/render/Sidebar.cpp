@@ -846,20 +846,6 @@ bool IsVerboseOnlyEvent(const std::string& type) {
     return type == "G_LIMIT_EXCEEDED" || type == "MISSILE_G_LIMIT_EXCEEDED";
 }
 
-// The value of `key=` in an event's space-separated data, or "" if absent.
-std::string EventField(const std::string& data, const std::string& key) {
-    std::string needle = key + "=";
-    size_t pos = 0;
-    while ((pos = data.find(needle, pos)) != std::string::npos) {
-        if (pos == 0 || data[pos - 1] == ' ') {
-            size_t start = pos + needle.size();
-            return data.substr(start, data.find(' ', start) - start);
-        }
-        pos += needle.size();
-    }
-    return "";
-}
-
 // A closest-approach MISS (the only kind with a Pk roll and no cause=)
 // whose warhead, not its guidance, decided the outcome.
 bool IsWarheadNoKill(const SimEvent& event) {
@@ -1230,6 +1216,9 @@ void DrawSettingsWindow() {
     ImGui::BeginDisabled(!settings.showTrails);
     SettingCheckbox("Full trail history", &settings.showFullTrail,
                     "Every recorded position, not just the last 30 seconds.");
+    SettingCheckbox("Event marks", &settings.showEventMarks,
+                    "Ticks on the trails where radar, RWR, launch and seeker events happened,\n"
+                    "on the part of the trail shown. Hover one for what and when.");
     ImGui::EndDisabled();
     ImGui::Unindent();
     SettingCheckbox("Radar cones", &settings.showRadarCones);

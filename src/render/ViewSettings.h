@@ -12,6 +12,7 @@ struct ViewSettings {
     // Display
     bool showTrails = true;
     bool showFullTrail = false;  // every recorded sample, not the rolling window
+    bool showEventMarks = true;  // event ticks on the visible trail
     bool showRadarCones = true;
     // Off: several missiles can be in flight at once.
     bool showSeekerCones = false;

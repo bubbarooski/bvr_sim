@@ -21,6 +21,7 @@ struct BoolEntry {
 constexpr BoolEntry kBoolEntries[] = {
     {"ShowTrails", &ViewSettings::showTrails},
     {"ShowFullTrail", &ViewSettings::showFullTrail},
+    {"ShowEventMarks", &ViewSettings::showEventMarks},
     {"ShowRadarCones", &ViewSettings::showRadarCones},
     {"ShowSeekerCones", &ViewSettings::showSeekerCones},
     {"ShowWaypointRoutes", &ViewSettings::showWaypointRoutes},

@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <deque>
 #include <optional>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -25,6 +26,7 @@
 #include "components/WaypointComponent.h"
 #include "ecs/ComponentStore.h"
 #include "render/EntityInspector.h"
+#include "render/EventMarks.h"
 #include "render/Mat4.h"
 #include "render/style/LatticeStyle.h"
 #include "sim/RadarEquation.h"
@@ -452,6 +454,34 @@ TrailClock::time_point gTrailLastRealTime;
 bool gTrailClockStarted = false;
 double gTrailTime = 0.0;
 double gTrailLastSampleTime = -1.0;
+
+// Event ticks on the trails (EventMarks). Stamped on the trail clock, so
+// the windowed trail shows exactly the ticks on its visible part.
+struct EventMark {
+    EntityID path;
+    Vec3f pos;
+    Vec3f dir;  // the path's direction of travel there, unit; zero if unknown
+    double trailTime;
+    ImVec4 color;
+    std::string label;  // "t=41.2 s  Radar lock"
+    bool drawn = false;  // last frame -- what hovering may report
+};
+std::vector<EventMark> gEventMarks;
+size_t gEventMarkCursor = 0;  // events already classified
+unsigned long long gEventMarkGeneration = ~0ull;
+
+// Last frame's positions and clocks: an event is placed by interpolating
+// between them at its sim time. At high speed one frame spans whole
+// sim-seconds -- a missile covers a mile -- so the frame's end would be
+// visibly off.
+std::unordered_map<EntityID, Vec3f> gPrevFramePos;
+double gPrevFrameSimTime = -1.0;
+double gPrevFrameTrailTime = 0.0;
+
+constexpr float kEventMarkHalfLengthPx = 11.0f;  // across the 8 px trail
+constexpr float kEventMarkHalfWidthPx = 2.0f;
+constexpr float kEventMarkOutlinePx = 1.5f;  // background-coloured border: an amber tick on an amber missile trail
+constexpr float kEventMarkHoverRadiusPx = 10.0f;
 
 // Camera-facing ribbon: each segment becomes a quad offset perpendicular
 // to both the segment and the view direction, since GL line width is
@@ -1046,6 +1076,105 @@ void DrawTrails(World& world, const FrameView& frame, bool showFullTrail) {
     }
 }
 
+// Turns the events logged since last frame into ticks, then remembers this
+// frame's positions for the next. Runs every frame, drawn or not, so a tick
+// is never lost to the setting being off when its event happened.
+void CollectEventMarks(World& world, const SimContext& simContext, double simTime, double trailNow) {
+    const EventLog& log = simContext.eventLog;
+    if (log.Generation() != gEventMarkGeneration) {  // a reset or reload: a new run's log
+        gEventMarkGeneration = log.Generation();
+        gEventMarkCursor = 0;
+        gEventMarks.clear();
+        gPrevFramePos.clear();
+        gPrevFrameSimTime = -1.0;
+    }
+    ComponentStore<Transform>& transforms = world.Components<Transform>();
+    const std::vector<SimEvent>& events = log.Events();
+    for (; gEventMarkCursor < events.size(); ++gEventMarkCursor) {
+        const SimEvent& event = events[gEventMarkCursor];
+        std::optional<EventMarks::MarkSpec> spec = EventMarks::Classify(world, event);
+        if (!spec) continue;
+        const Transform* transform = transforms.TryGet(spec->path);
+        if (transform == nullptr) continue;
+        Vec3f now = ToVec3f(transform->pos);
+        auto prevIt = gPrevFramePos.find(spec->path);
+        Vec3f prev = prevIt != gPrevFramePos.end() ? prevIt->second : now;
+        double span = simTime - gPrevFrameSimTime;
+        float f = gPrevFrameSimTime >= 0.0 && span > 0.0
+                      ? static_cast<float>(std::clamp((event.simTime - gPrevFrameSimTime) / span, 0.0, 1.0))
+                      : 1.0f;
+        Vec3f travel = now - prev;
+        float travelLen = travel.norm();
+
+        EventMark mark;
+        mark.path = spec->path;
+        mark.pos = prev + travel * f;
+        mark.dir = travelLen > kMinSegmentFt ? Vec3f(travel * (1.0f / travelLen)) : Vec3f::Zero();
+        mark.trailTime = gPrevFrameSimTime >= 0.0 ? gPrevFrameTrailTime + (trailNow - gPrevFrameTrailTime) * f
+                                                  : trailNow;
+        mark.color = spec->tier ? LatticeStyle::RadarTrackModeColor(*spec->tier) : LatticeStyle::kTextPrimary;
+        char label[96];
+        std::snprintf(label, sizeof(label), "t=%.1f s  %s", event.simTime, spec->label);
+        mark.label = label;
+        gEventMarks.push_back(std::move(mark));
+    }
+    for (auto& [entity, transform] : transforms) gPrevFramePos[entity] = ToVec3f(transform.pos);
+    gPrevFrameSimTime = simTime;
+    gPrevFrameTrailTime = trailNow;
+}
+
+// A tick on the part of its path the trail shows: all of it with the full
+// history, else its last kTrailMaxAgeSec, as AppendTrailRibbon draws.
+bool EventMarkOnVisibleTrail(const EventMark& mark, double trailNow, bool showFullTrail) {
+    return showFullTrail || mark.trailTime >= trailNow - kTrailMaxAgeSec;
+}
+
+// A short bar across the path, flat to the screen: perpendicular to the
+// path's direction as seen from the eye. halfLength across, halfWidth along.
+void AppendEventTick(std::vector<float>& out, const FrameView& frame, const EventMark& mark, float extraPx) {
+    Vec3f toCam = frame.eye - mark.pos;
+    float toCamLen = toCam.norm();
+    Vec3f viewDir = toCamLen > kMinSegmentFt ? Vec3f(toCam * (1.0f / toCamLen)) : Vec3f{0.0f, 1.0f, 0.0f};
+    Vec3f dir = mark.dir.squaredNorm() > 0.0f ? mark.dir : Vec3f{1.0f, 0.0f, 0.0f};
+    Vec3f across = dir.cross(viewDir);
+    float acrossLen = across.norm();
+    // Travelling straight at the eye: any screen direction will do.
+    across = acrossLen > kMinCrossNorm ? Vec3f(across * (1.0f / acrossLen)) : viewDir.unitOrthogonal();
+    Vec3f along = viewDir.cross(across).normalized();
+
+    float halfLength = frame.WorldLengthForPixels(mark.pos, kEventMarkHalfLengthPx + extraPx);
+    float halfWidth = frame.WorldLengthForPixels(mark.pos, kEventMarkHalfWidthPx + extraPx);
+    Vec3f a = mark.pos + across * halfLength + along * halfWidth;
+    Vec3f b = mark.pos - across * halfLength + along * halfWidth;
+    Vec3f c = mark.pos - across * halfLength - along * halfWidth;
+    Vec3f d = mark.pos + across * halfLength - along * halfWidth;
+    for (Vec3f v : {a, b, c, a, c, d}) {
+        out.push_back(v.x());
+        out.push_back(v.y());
+        out.push_back(v.z());
+    }
+}
+
+// After the trails, so each tick sits on top of its line; only where that
+// line is drawn.
+void DrawEventMarks(World& world, const FrameView& frame, bool showFullTrail) {
+    ComponentStore<Transform>& transforms = world.Components<Transform>();
+    UseMarkerProgram(frame);
+    for (EventMark& mark : gEventMarks) {
+        auto trailIt = gTrailHistory.find(mark.path);
+        mark.drawn = transforms.Has(mark.path) && trailIt != gTrailHistory.end() && trailIt->second.size() >= 2 &&
+                     EventMarkOnVisibleTrail(mark, frame.trailNow, showFullTrail);
+        if (!mark.drawn) continue;
+        std::vector<float> outline, tick;
+        AppendEventTick(outline, frame, mark, kEventMarkOutlinePx);
+        AppendEventTick(tick, frame, mark, 0.0f);
+        SetColor(LatticeStyle::kBackground, 1.0f);
+        UploadAndDraw(outline, GL_TRIANGLES);
+        SetColor(mark.color, 1.0f);
+        UploadAndDraw(tick, GL_TRIANGLES);
+    }
+}
+
 }  // namespace
 
 namespace RenderSystem {
@@ -1122,6 +1251,24 @@ void Init() {
 void ResetTrails() {
     gTrailHistory.clear();
     gTrailLastSampleTime = -1.0;
+    gEventMarks.clear();
+    gPrevFramePos.clear();
+    gPrevFrameSimTime = -1.0;
+}
+
+std::string HoveredEventMarks(const Mat4& viewProj, int viewportWidth, int viewportHeight, float screenX,
+                              float screenY) {
+    std::string labels;
+    for (const EventMark& mark : gEventMarks) {
+        if (!mark.drawn) continue;
+        float x = 0.0f, y = 0.0f;
+        if (!WorldToScreen(mark.pos, viewProj, viewportWidth, viewportHeight, x, y)) continue;
+        float dx = x - screenX, dy = y - screenY;
+        if (dx * dx + dy * dy > kEventMarkHoverRadiusPx * kEventMarkHoverRadiusPx) continue;
+        if (!labels.empty()) labels += '\n';
+        labels += mark.label;
+    }
+    return labels;
 }
 
 void Shutdown() {
@@ -1154,6 +1301,7 @@ void Draw(World& world, const SimContext& simContext, int viewportWidth, int vie
     frame.focalY = proj(1, 1);
     frame.trailNow = AdvanceTrailClock(options.paused);
 
+    CollectEventMarks(world, simContext, options.simTime, frame.trailNow);
     DrawEntityMarkers(world, frame);
 
     // Everything below is see-through: depth writes off so translucent
@@ -1170,6 +1318,11 @@ void Draw(World& world, const SimContext& simContext, int viewportWidth, int vie
     if (options.selectedWaypointIndex.has_value()) DrawWaypointGizmo(world, frame, *options.selectedWaypointIndex);
     DrawSelectionRing(world, frame);
     if (view.showTrails) DrawTrails(world, frame, view.showFullTrail);
+    if (view.showTrails && view.showEventMarks) {
+        DrawEventMarks(world, frame, view.showFullTrail);
+    } else {
+        for (EventMark& mark : gEventMarks) mark.drawn = false;
+    }
 
     glDepthMask(GL_TRUE);
     glDisable(GL_BLEND);

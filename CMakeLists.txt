@@ -162,6 +162,7 @@ add_executable(intercept_sim
     src/app/main.cpp
     src/render/Camera.cpp
     src/render/EntityInspector.cpp
+    src/render/EventMarks.cpp
     src/render/RadarConeTier.cpp
     src/render/ParameterPanel.cpp
     src/render/RenderSystem.cpp
@@ -309,6 +310,7 @@ add_executable(unit_tests
     tests/unit/ComponentStoreTest.cpp
     tests/unit/DragTableTest.cpp
     tests/unit/EventLogTest.cpp
+    tests/unit/EventMarksTest.cpp
     tests/unit/FlightEnvelopeTest.cpp
     tests/unit/InterceptSystemTest.cpp
     tests/unit/LaunchZoneTest.cpp
@@ -331,6 +333,7 @@ add_executable(unit_tests
     src/missile/MissileNormalForce.cpp
     src/ecs/World.cpp
     src/render/Camera.cpp
+    src/render/EventMarks.cpp
     src/render/RadarConeTier.cpp
     src/scenario/ParamRegistry.cpp
     src/sim/AircraftBounds.cpp

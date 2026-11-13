@@ -14,6 +14,9 @@ struct SimEvent {
     std::string data;
 };
 
+// The value of `key=` in an event's space-separated data, or "" if absent.
+std::string EventField(const std::string& data, const std::string& key);
+
 // Human-readable event log, owned by SimContext alongside the seeded RNG
 // stream. Systems call Record directly. This is what the GUI renders and
 // what a headless batch run parses for outcome statistics.

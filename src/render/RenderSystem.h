@@ -1,11 +1,13 @@
 #pragma once
 
 #include <optional>
+#include <string>
 
 #include "components/AirborneRadarComponent.h"
 #include "components/AirborneRadarTrack.h"
 #include "ecs/World.h"
 #include "render/Camera.h"
+#include "render/Mat4.h"
 #include "render/ViewSettings.h"
 #include "sim/SimContext.h"
 
@@ -31,14 +33,23 @@ float GridSpacingFt(float cameraDistance);
 
 void Init();
 void Shutdown();
-// Clears every entity's trail history. Call after a reload, whose new
-// entities reuse the old IDs.
+// Clears every entity's trail history and event ticks. Call after a reload,
+// whose new entities reuse the old IDs.
 void ResetTrails();
+
+// The labels ("t=41.2 s  Radar lock"), one per line, of the event ticks
+// drawn last frame within hover reach of a cursor at (screenX, screenY);
+// empty if none. Same window units and viewProj as entity picking.
+std::string HoveredEventMarks(const Mat4& viewProj, int viewportWidth, int viewportHeight, float screenX,
+                              float screenY);
 // Per-frame display choices.
 struct RenderOptions {
     // Freezes trail aging, so trails don't fade away purely from real time
     // spent paused.
     bool paused = false;
+
+    // Places event ticks between frames (s).
+    double simTime = 0.0;
 
     // What to draw (the viewer's Settings window).
     ViewSettings view;
