@@ -9,7 +9,7 @@ browser (Chrome or Edge, whichever is installed) to print it.
 
 Options:
     --input PATH    markdown source        (default docs/REFERENCE.md)
-    --output PATH   pdf destination        (default docs/intercept_sim_reference.pdf)
+    --output PATH   pdf destination        (default docs/bvr_sim_reference.pdf)
     --no-sources    leave out the docs/SOURCES.md appendix
     --keep-html     leave the intermediate HTML next to the PDF
     --browser PATH  explicit browser executable
@@ -310,7 +310,7 @@ blockquote {
 COVER = """
 <div class="cover">
   <div class="eyebrow">Modeling &amp; Simulation Reference</div>
-  <h1>intercept_sim</h1>
+  <h1>bvr_sim</h1>
   <div class="subtitle">Physics, sensor models, and guidance mathematics</div>
   <p class="blurb">A single-process air-engagement simulator: six-degree-of-freedom
   aircraft dynamics, a proportional-navigation missile, pulse-Doppler radar and
@@ -405,7 +405,7 @@ def build_html(markdown_text):
 
     return (
         "<!doctype html>\n<html><head><meta charset='utf-8'>"
-        "<title>intercept_sim &mdash; Modeling &amp; Simulation Reference</title>"
+        "<title>bvr_sim &mdash; Modeling &amp; Simulation Reference</title>"
         f"<style>{CSS}</style></head><body>"
         f"{cover}{toc_html}{body_html}"
         "</body></html>"
@@ -436,7 +436,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", default=REPO_ROOT / "docs" / "REFERENCE.md", type=Path)
     parser.add_argument(
-        "--output", default=REPO_ROOT / "docs" / "intercept_sim_reference.pdf", type=Path
+        "--output", default=REPO_ROOT / "docs" / "bvr_sim_reference.pdf", type=Path
     )
     parser.add_argument("--no-sources", action="store_true")
     parser.add_argument("--keep-html", action="store_true")

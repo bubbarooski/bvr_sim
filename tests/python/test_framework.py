@@ -1,6 +1,6 @@
 """experiments/_framework.py: the pointer helper, and what run_batch does when
 runs fail or the runner cannot start. Needs pandas; the run_batch tests also
-need a built Release intercept_batch and skip without one."""
+need a built Release bvr_batch and skip without one."""
 
 import importlib
 import sys
@@ -38,7 +38,7 @@ class DotToPointer(unittest.TestCase):
 
 
 @unittest.skipIf(framework is None, "pandas is not installed")
-@unittest.skipUnless(framework is not None and framework.BATCH_EXE.exists(), "intercept_batch is not built")
+@unittest.skipUnless(framework is not None and framework.BATCH_EXE.exists(), "bvr_batch is not built")
 class RunBatch(unittest.TestCase):
     SCENARIO = "scenarios/1_core_01_first_shot.json"
 

@@ -104,7 +104,7 @@ bool IsMilestoneEvent(const std::string& type) {
 
 void PrintUsage() {
     std::printf(
-        "usage: intercept_batch --spec <spec.json> --out <results.csv>\n"
+        "usage: bvr_batch --spec <spec.json> --out <results.csv>\n"
         "                      [--jobs N] [--affinity] [--record <dir>] [--record-decimation N]\n"
         "\n"
         "  --spec               batch spec: scenario path, max_sim_time_s, and a runs[] list\n"
@@ -138,25 +138,25 @@ bool ParseArgs(int argc, char** argv, Options& options) {
             options.outPath = argv[++i];
         } else if (arg == "--jobs" && hasValue) {
             if (!ParseInt(argv[++i], 0, options.jobs)) {
-                std::printf("intercept_batch: --jobs needs a non-negative integer, got '%s'\n\n", argv[i]);
+                std::printf("bvr_batch: --jobs needs a non-negative integer, got '%s'\n\n", argv[i]);
                 return false;
             }
         } else if (arg == "--record" && hasValue) {
             options.recordDir = argv[++i];
         } else if (arg == "--record-decimation" && hasValue) {
             if (!ParseInt(argv[++i], 1, options.recordDecimation)) {
-                std::printf("intercept_batch: --record-decimation needs a positive integer, got '%s'\n\n", argv[i]);
+                std::printf("bvr_batch: --record-decimation needs a positive integer, got '%s'\n\n", argv[i]);
                 return false;
             }
         } else if (arg == "--affinity") {
             options.affinity = true;
         } else {
-            std::printf("intercept_batch: unrecognized or incomplete argument '%s'\n\n", arg.c_str());
+            std::printf("bvr_batch: unrecognized or incomplete argument '%s'\n\n", arg.c_str());
             return false;
         }
     }
     if (options.specPath.empty() || options.outPath.empty()) {
-        std::printf("intercept_batch: --spec and --out are both required\n\n");
+        std::printf("bvr_batch: --spec and --out are both required\n\n");
         return false;
     }
     return true;
@@ -410,7 +410,7 @@ int main(int argc, char** argv) {
         spec = ScenarioLoader::ReadJsonFile(options.specPath);
         baseScenario = ScenarioLoader::ReadJsonFile(spec.at("scenario").get<std::string>());
     } catch (const std::exception& e) {
-        std::printf("intercept_batch: %s\n", e.what());
+        std::printf("bvr_batch: %s\n", e.what());
         return 1;
     }
 
@@ -453,18 +453,18 @@ int main(int argc, char** argv) {
             ++position;
         }
     } catch (const std::exception& e) {
-        std::printf("intercept_batch: malformed spec %s: %s\n", options.specPath.c_str(), e.what());
+        std::printf("bvr_batch: malformed spec %s: %s\n", options.specPath.c_str(), e.what());
         return 1;
     }
     if (runs.empty()) {
-        std::printf("intercept_batch: spec contains no runs\n");
+        std::printf("bvr_batch: spec contains no runs\n");
         return 1;
     }
     std::vector<std::pair<std::string, std::string>> overrideColumns = OverrideColumns(runs);
     for (const auto& [pointer, name] : overrideColumns) {
         std::string error = ValidateOverride(pointer, baseScenario);
         if (!error.empty()) {
-            std::printf("intercept_batch: %s\n", error.c_str());
+            std::printf("bvr_batch: %s\n", error.c_str());
             return 1;
         }
     }
@@ -473,14 +473,14 @@ int main(int argc, char** argv) {
         std::error_code ec;
         std::filesystem::create_directories(options.recordDir, ec);
         if (ec || !std::filesystem::is_directory(options.recordDir)) {
-            std::printf("intercept_batch: cannot create the --record directory %s\n", options.recordDir.c_str());
+            std::printf("bvr_batch: cannot create the --record directory %s\n", options.recordDir.c_str());
             return 1;
         }
     }
 
     std::ofstream out(options.outPath);
     if (!out.is_open()) {
-        std::printf("intercept_batch: cannot write to %s\n", options.outPath.c_str());
+        std::printf("bvr_batch: cannot write to %s\n", options.outPath.c_str());
         return 1;
     }
 
@@ -494,7 +494,7 @@ int main(int argc, char** argv) {
     eventsPath += "_events.csv";
     std::ofstream eventsOut(eventsPath);
     if (!eventsOut.is_open()) {
-        std::printf("intercept_batch: cannot write to %s\n", eventsPath.string().c_str());
+        std::printf("bvr_batch: cannot write to %s\n", eventsPath.string().c_str());
         return 1;
     }
     eventsOut << "run_id,sim_time_s,type,entity,data\n";
@@ -517,7 +517,7 @@ int main(int argc, char** argv) {
     jobs = std::min<unsigned int>(jobs, static_cast<unsigned int>(runs.size()));
     jobs = std::min<unsigned int>(jobs, kMaxWorkers);  // a thread per run helps nothing
 
-    std::printf("intercept_batch: %zu runs of %s across %u thread(s)\n", runs.size(),
+    std::printf("bvr_batch: %zu runs of %s across %u thread(s)\n", runs.size(),
                 spec.at("scenario").get<std::string>().c_str(), jobs);
 
     std::atomic<size_t> nextRun{0};
@@ -621,11 +621,11 @@ int main(int argc, char** argv) {
     eventsOut.close();
 
     double elapsedS = std::chrono::duration<double>(std::chrono::steady_clock::now() - started).count();
-    std::printf("intercept_batch: %zu runs in %.1fs (%.2fs/run wall, %.1f runs/s)\n", runs.size(), elapsedS,
+    std::printf("bvr_batch: %zu runs in %.1fs (%.2fs/run wall, %.1f runs/s)\n", runs.size(), elapsedS,
                 elapsedS / runs.size(), runs.size() / elapsedS);
     std::printf("  %s\n  %s\n", options.outPath.c_str(), eventsPath.string().c_str());
     if (failures > 0) {
-        std::printf("intercept_batch: %d run(s) FAILED -- see the \"error\" column\n", failures.load());
+        std::printf("bvr_batch: %d run(s) FAILED -- see the \"error\" column\n", failures.load());
         return 1;
     }
     return 0;

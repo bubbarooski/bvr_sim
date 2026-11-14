@@ -8,7 +8,7 @@ pipeline work, then edit the marked sections to ask your own question.
 
 Before running:
   1. Build the headless batch runner in Release (Debug is ~10x slower):
-       cmake --build build --config Release --target intercept_batch
+       cmake --build build --config Release --target bvr_batch
   2. pip install -r requirements.txt   (this needs pandas)
 
 Run from anywhere:  python experiments/_template.py
@@ -115,7 +115,7 @@ def main():
     runs, _ = build_runs()
     print(f"{len(LEVELS)} levels x {SEEDS} seeds = {len(runs)} runs")
 
-    # run_batch writes a spec JSON, invokes the Release intercept_batch exe
+    # run_batch writes a spec JSON, invokes the Release bvr_batch exe
     # against it, and returns the path to the results CSV it wrote.
     # name= just controls the output filename under experiments/results/
     # (gitignored -- delete it or regenerate anytime by rerunning this).

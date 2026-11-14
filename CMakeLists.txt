@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.25)
 # C is enabled for deps/gl3w/src/gl3w.c: without it that lone C source compiles
 # with cl.exe's default static CRT (/MT) instead of the /MD everything else
-# uses, and the mismatch warns (LNK4098) when it reaches intercept_sim.
-project(intercept_sim CXX C)
+# uses, and the mismatch warns (LNK4098) when it reaches bvr_sim.
+project(bvr_sim CXX C)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -78,7 +78,7 @@ target_link_libraries(imgui PUBLIC glfw gl3w OpenGL::GL)
 set_target_properties(gl3w imgui PROPERTIES SYSTEM TRUE)
 
 # Warnings for this project's own targets only.
-function(intercept_warnings target)
+function(bvr_warnings target)
     if(MSVC)
         target_compile_options(${target} PRIVATE /W4)
     else()
@@ -86,10 +86,10 @@ function(intercept_warnings target)
     endif()
 endfunction()
 
-# The output folder holds only the app (intercept_sim, intercept_batch and
+# The output folder holds only the app (bvr_sim, bvr_batch and
 # the data they load); tests and measurement tools go in tests/ and tools/
 # below it. Multi-config generators (Visual Studio) add the config folder.
-function(intercept_output_subdir target subdir)
+function(bvr_output_subdir target subdir)
     if(CMAKE_CONFIGURATION_TYPES)
         set(dir "${CMAKE_BINARY_DIR}/$<CONFIG>/${subdir}")
     else()
@@ -97,8 +97,8 @@ function(intercept_output_subdir target subdir)
     endif()
     set_target_properties(${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${dir}" ARCHIVE_OUTPUT_DIRECTORY "${dir}")
 endfunction()
-intercept_output_subdir(gl3w lib)
-intercept_output_subdir(imgui lib)
+bvr_output_subdir(gl3w lib)
+bvr_output_subdir(imgui lib)
 
 # Back on for the C++ targets, so their objects get /GL and the final link
 # runs /LTCG against JSBSim.
@@ -118,7 +118,7 @@ target_compile_definitions(eigen INTERFACE EIGEN_INITIALIZE_MATRICES_BY_ZERO)
 # full-pipeline targets get everything and the leaner ones stay lean without a
 # separate source list. libJSBSim and the include dirs are PUBLIC so consumers
 # inherit them.
-add_library(intercept_core STATIC
+add_library(bvr_core STATIC
     src/ecs/World.cpp
     src/scenario/ParamRegistry.cpp
     src/scenario/ScenarioLoader.cpp
@@ -151,15 +151,15 @@ add_library(intercept_core STATIC
     src/systems/RwrSystem.cpp
     src/systems/WaypointSystem.cpp
 )
-target_include_directories(intercept_core PUBLIC src)
-target_include_directories(intercept_core SYSTEM PUBLIC deps/json)
-target_link_libraries(intercept_core PUBLIC libJSBSim eigen)
-intercept_warnings(intercept_core)
-intercept_output_subdir(intercept_core lib)
+target_include_directories(bvr_core PUBLIC src)
+target_include_directories(bvr_core SYSTEM PUBLIC deps/json)
+target_link_libraries(bvr_core PUBLIC libJSBSim eigen)
+bvr_warnings(bvr_core)
+bvr_output_subdir(bvr_core lib)
 
 # GUI application: sim core + renderer + the scenario editor/saver (GUI-only,
 # so not in the shared core). imgui pulls in glfw/gl3w/OpenGL transitively.
-add_executable(intercept_sim
+add_executable(bvr_sim
     src/app/main.cpp
     src/render/Camera.cpp
     src/render/EntityInspector.cpp
@@ -171,104 +171,104 @@ add_executable(intercept_sim
     src/render/ViewSettings.cpp
     src/render/style/LatticeStyle.cpp
 )
-target_link_libraries(intercept_sim PRIVATE intercept_core imgui)
-intercept_warnings(intercept_sim)
+target_link_libraries(bvr_sim PRIVATE bvr_core imgui)
+bvr_warnings(bvr_sim)
 
 # Link (don't copy) scenarios/ into the output dir so hand/GUI edits take effect
 # with no rebuild. remove_directory first -- mklink/create_symlink fail if the
 # link path already exists. The link is a separate -P script because mklink
 # needs a native backslash path, which only exists once the generator
 # expression has resolved.
-add_custom_command(TARGET intercept_sim POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "$<TARGET_FILE_DIR:intercept_sim>/scenarios"
+add_custom_command(TARGET bvr_sim POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E remove_directory "$<TARGET_FILE_DIR:bvr_sim>/scenarios"
     COMMAND ${CMAKE_COMMAND}
-            "-DLINK_PATH=$<TARGET_FILE_DIR:intercept_sim>/scenarios"
+            "-DLINK_PATH=$<TARGET_FILE_DIR:bvr_sim>/scenarios"
             "-DTARGET_PATH=${CMAKE_SOURCE_DIR}/scenarios"
             -P "${CMAKE_SOURCE_DIR}/cmake/CreateScenarioJunction.cmake"
     COMMENT "Linking scenarios/ into output directory")
 
 # data/ and fonts/ load via cwd-relative paths too, but aren't hand-edited live
 # -- copied, not linked.
-add_custom_command(TARGET intercept_sim POST_BUILD
+add_custom_command(TARGET bvr_sim POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_SOURCE_DIR}/data" "$<TARGET_FILE_DIR:intercept_sim>/data"
+            "${CMAKE_SOURCE_DIR}/data" "$<TARGET_FILE_DIR:bvr_sim>/data"
     COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:intercept_sim>/fonts"
+            "$<TARGET_FILE_DIR:bvr_sim>/fonts"
     COMMAND ${CMAKE_COMMAND} -E copy
             "${CMAKE_SOURCE_DIR}/deps/imgui/misc/fonts/Roboto-Medium.ttf"
             "${CMAKE_SOURCE_DIR}/deps/imgui/misc/fonts/Cousine-Regular.ttf"
-            "$<TARGET_FILE_DIR:intercept_sim>/fonts"
+            "$<TARGET_FILE_DIR:bvr_sim>/fonts"
     COMMENT "Copying data/ and fonts/ to output directory")
 
 # --- Headless drivers and measurement tools: each links the whole sim core ---
 
 # Parallel Monte Carlo driver: runs the sim pipeline over a caller-supplied run
 # list. Threads::Threads for the std::thread worker pool. Run from repo root.
-add_executable(intercept_batch src/batch/BatchMain.cpp)
+add_executable(bvr_batch src/batch/BatchMain.cpp)
 find_package(Threads REQUIRED)
-target_link_libraries(intercept_batch PRIVATE intercept_core Threads::Threads)
-intercept_warnings(intercept_batch)
+target_link_libraries(bvr_batch PRIVATE bvr_core Threads::Threads)
+bvr_warnings(bvr_batch)
 
 # Sim-side performance benchmark (SimLoop::Step over N aircraft). Prints timing
 # + a behavior checksum; not a pass/fail gate. See tests/perf_benchmark.cpp.
 add_executable(perf_benchmark tests/perf_benchmark.cpp)
-target_link_libraries(perf_benchmark PRIVATE intercept_core)
-intercept_warnings(perf_benchmark)
-intercept_output_subdir(perf_benchmark tools)
+target_link_libraries(perf_benchmark PRIVATE bvr_core)
+bvr_warnings(perf_benchmark)
+bvr_output_subdir(perf_benchmark tools)
 
 # Sim vs PUBLISHED real-world F-16/AIM-120 figures. A measurement instrument,
 # not a pass/fail gate. Run from repo root so JSBSim resolves aircraft data.
 # See docs/VALIDATION.md.
 add_executable(real_world_validation tests/real_world_validation.cpp)
-target_link_libraries(real_world_validation PRIVATE intercept_core)
-intercept_warnings(real_world_validation)
-intercept_output_subdir(real_world_validation tools)
+target_link_libraries(real_world_validation PRIVATE bvr_core)
+bvr_warnings(real_world_validation)
+bvr_output_subdir(real_world_validation tools)
 
 # F-16 pitch FCS design, step 1: identifies the bare airframe's short-period
 # model over an altitude x Mach grid (CSV to stdout). tools/fit/fcs_design.py
 # turns it into the gain tables in f16.xml. Run from repo root.
 add_executable(fcs_identify tools/drivers/fcs_identify.cpp)
-target_link_libraries(fcs_identify PRIVATE intercept_core)
-intercept_warnings(fcs_identify)
-intercept_output_subdir(fcs_identify tools)
+target_link_libraries(fcs_identify PRIVATE bvr_core)
+bvr_warnings(fcs_identify)
+bvr_output_subdir(fcs_identify tools)
 
 # Engine thrust fit, step 1: samples the F-16's 1 g drag and alpha over
 # Mach in level accelerations (CSV). tools/fit/thrust_fit.py fits the thrust
 # tables to the flight manual's acceleration times with it. Flies the
 # validation rig's aircraft, hence tests/ on the include path.
 add_executable(drag_sample tools/drivers/drag_sample.cpp)
-target_link_libraries(drag_sample PRIVATE intercept_core)
+target_link_libraries(drag_sample PRIVATE bvr_core)
 target_include_directories(drag_sample PRIVATE tests)
-intercept_warnings(drag_sample)
-intercept_output_subdir(drag_sample tools)
+bvr_warnings(drag_sample)
+bvr_output_subdir(drag_sample tools)
 
 # Part-throttle fuel flow fit, step 1: the thrust and engine speed the
 # model needs at each of a flight manual's steady cruise points (CSV).
 # tools/fit/fuel_fit.py fits the part-throttle factor with it. Flies the
 # validation rig's aircraft.
 add_executable(cruise_sample tools/drivers/cruise_sample.cpp)
-target_link_libraries(cruise_sample PRIVATE intercept_core)
+target_link_libraries(cruise_sample PRIVATE bvr_core)
 target_include_directories(cruise_sample PRIVATE tests)
-intercept_warnings(cruise_sample)
-intercept_output_subdir(cruise_sample tools)
+bvr_warnings(cruise_sample)
+bvr_output_subdir(cruise_sample tools)
 
 # Drag-due-to-lift check, step 1: Ps in hard level turns at a flight
 # manual's sustained-turn load factors (CSV). tools/fit/lift_drag_fit.py fits
 # the drag correction from it. Flies the validation rig's aircraft.
 add_executable(turn_sample tools/drivers/turn_sample.cpp)
-target_link_libraries(turn_sample PRIVATE intercept_core)
+target_link_libraries(turn_sample PRIVATE bvr_core)
 target_include_directories(turn_sample PRIVATE tests)
-intercept_warnings(turn_sample)
-intercept_output_subdir(turn_sample tools)
+bvr_warnings(turn_sample)
+bvr_output_subdir(turn_sample tools)
 
 # Launch zone: flies a missile type over a grid of launch conditions for its
 # maximum launch range against a non-maneuvering target, into
 # data/missiles/<id>/fit/launch_zone.json. Threads::Threads for the worker
 # pool. Run from repo root.
 add_executable(launch_zone tools/drivers/launch_zone.cpp)
-target_link_libraries(launch_zone PRIVATE intercept_core Threads::Threads)
-intercept_warnings(launch_zone)
-intercept_output_subdir(launch_zone tools)
+target_link_libraries(launch_zone PRIVATE bvr_core Threads::Threads)
+bvr_warnings(launch_zone)
+bvr_output_subdir(launch_zone tools)
 
 # --- Tests (GoogleTest) ---
 # gtest_force_shared_crt: GoogleTest defaults to MSVC's static CRT (/MT);
@@ -292,12 +292,12 @@ set(CMAKE_GTEST_DISCOVER_TESTS_DISCOVERY_MODE PRE_TEST)
 # resolve: tests/TestMain.cpp changes to it before running them. Not
 # gtest_discover_tests' WORKING_DIRECTORY -- discovery would then run from
 # the root too, and CMake writes its test-list JSON into <cwd>/CMakeFiles/.
-function(intercept_add_test target)
+function(bvr_add_test target)
     target_sources(${target} PRIVATE tests/TestMain.cpp)
     target_compile_definitions(${target} PRIVATE INTERCEPT_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
     target_link_libraries(${target} PRIVATE gtest)
-    intercept_warnings(${target})
-    intercept_output_subdir(${target} tests)
+    bvr_warnings(${target})
+    bvr_output_subdir(${target} tests)
     gtest_discover_tests(${target})
 endfunction()
 
@@ -351,7 +351,7 @@ target_include_directories(unit_tests SYSTEM PRIVATE deps/json)
 # imgui (and through it GLFW) only to link Camera.cpp, whose input handling
 # the tests never call.
 target_link_libraries(unit_tests PRIVATE eigen imgui)
-intercept_add_test(unit_tests)
+bvr_add_test(unit_tests)
 
 # Whole-pipeline validation: physics and behavior checked against closed
 # forms, independent re-derivations, and known answers -- guidance and
@@ -373,15 +373,15 @@ add_executable(validation_tests
     tests/validation/ScenarioSaverValidationTest.cpp
     tests/validation/ScenarioSmokeValidationTest.cpp
 )
-target_link_libraries(validation_tests PRIVATE intercept_core)
-# BatchCliValidationTest runs the built intercept_batch of the same config.
-add_dependencies(validation_tests intercept_batch)
-target_compile_definitions(validation_tests PRIVATE INTERCEPT_BATCH_EXE="$<TARGET_FILE:intercept_batch>")
-intercept_add_test(validation_tests)
+target_link_libraries(validation_tests PRIVATE bvr_core)
+# BatchCliValidationTest runs the built bvr_batch of the same config.
+add_dependencies(validation_tests bvr_batch)
+target_compile_definitions(validation_tests PRIVATE BVR_BATCH_EXE="$<TARGET_FILE:bvr_batch>")
+bvr_add_test(validation_tests)
 
 # The Python tooling's own tests (tests/python/, stdlib unittest): the pointer
 # helper, the batch_compare regression gate and clean.py's deletion rules.
-# Cases that need pandas or a built intercept_batch skip without them.
+# Cases that need pandas or a built bvr_batch skip without them.
 find_package(Python3 COMPONENTS Interpreter)
 if(Python3_Interpreter_FOUND)
     add_test(NAME PythonTools

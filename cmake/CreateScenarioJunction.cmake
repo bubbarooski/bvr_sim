@@ -1,5 +1,5 @@
 # Invoked at build time (cmake -P, with -DLINK_PATH=... -DTARGET_PATH=...)
-# from CMakeLists.txt's intercept_sim POST_BUILD step. Exists only because
+# from CMakeLists.txt's bvr_sim POST_BUILD step. Exists only because
 # Windows mklink treats a bare "/" as a switch prefix -- an unconverted
 # forward-slash path like "C:/Users/..." (which is what CMake generator
 # expressions like $<TARGET_FILE_DIR:...> always resolve to) makes mklink

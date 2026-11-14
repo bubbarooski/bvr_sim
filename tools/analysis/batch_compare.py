@@ -7,7 +7,7 @@ missile scenario over a fixed seed range, keeps the results under a
 label, and compares two labels run by run.
 
     python tools/analysis/batch_compare.py run base          # at the commit before the change
-    (make the change, rebuild intercept_batch Release)
+    (make the change, rebuild bvr_batch Release)
     python tools/analysis/batch_compare.py run new
     python tools/analysis/batch_compare.py diff base new
     python tools/analysis/batch_compare.py run stt --set /missile_doctrine/launch_mode=STT
@@ -35,7 +35,7 @@ gate for a behaviour-preserving change. It fails if the labels were run with
 different seeds or overrides, if either has a scenario the other lacks, or
 if they share none.
 
-Requires pandas and a Release build of intercept_batch (see
+Requires pandas and a Release build of bvr_batch (see
 experiments/_framework.py, whose run_batch this uses).
 """
 

@@ -1,4 +1,4 @@
-"""Reusable Monte Carlo plumbing for intercept_sim experiments.
+"""Reusable Monte Carlo plumbing for bvr_sim experiments.
 
 An experiment script builds a list of runs, calls run_batch, and analyzes
 the DataFrame that load_results hands back. Everything specific to a
@@ -19,7 +19,7 @@ Results are CSV: a wide one-row-per-run table, plus a long-format event
 table alongside it that load_events reads and that joins back on run_id.
 Both open directly in a spreadsheet.
 
-Requires pandas, and a Release build of intercept_batch.
+Requires pandas, and a Release build of bvr_batch.
 """
 
 import json
@@ -33,7 +33,7 @@ import pandas as pd
 REPO_ROOT = Path(__file__).resolve().parent.parent
 # Multi-config generators (Visual Studio, Xcode) nest under the config name;
 # single-config ones (Makefiles, Ninja) put the binary straight in build/.
-_EXE_NAME = "intercept_batch.exe" if sys.platform == "win32" else "intercept_batch"
+_EXE_NAME = "bvr_batch.exe" if sys.platform == "win32" else "bvr_batch"
 _EXE_CANDIDATES = [REPO_ROOT / "build" / "Release" / _EXE_NAME, REPO_ROOT / "build" / _EXE_NAME]
 BATCH_EXE = next((p for p in _EXE_CANDIDATES if p.exists()), _EXE_CANDIDATES[0])
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
@@ -87,9 +87,9 @@ def run_batch(scenario, runs, jobs=None, record=False, max_sim_time_s=400.0, nam
     """
     if not BATCH_EXE.exists():
         raise SystemExit(
-            f"intercept_batch not found at {BATCH_EXE}\n"
+            f"bvr_batch not found at {BATCH_EXE}\n"
             "Build it first:\n"
-            '    cmake --build build --config Release --target intercept_batch\n'
+            '    cmake --build build --config Release --target bvr_batch\n'
             "Release specifically -- a Debug build is ~10x slower and would turn a\n"
             "few minutes of sweep into an hour."
         )
@@ -119,11 +119,11 @@ def run_batch(scenario, runs, jobs=None, record=False, max_sim_time_s=400.0, nam
     # spec or an override was bad -- is an error here.
     if status not in (0, 1) or not out_path.exists():
         raise RuntimeError(
-            f"intercept_batch exited with status {status} and wrote no results to {out_path.name}; "
+            f"bvr_batch exited with status {status} and wrote no results to {out_path.name}; "
             "its output is above"
         )
     if status == 1:
-        print("intercept_batch: some runs failed; see the 'error' column of the results", file=sys.stderr)
+        print("bvr_batch: some runs failed; see the 'error' column of the results", file=sys.stderr)
     return out_path
 
 

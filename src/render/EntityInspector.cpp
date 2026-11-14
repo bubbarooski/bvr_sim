@@ -90,7 +90,7 @@ void DrawLiveFields(World& world, const SimContext& simContext, EntityID entity,
         ImGui::Text("%s", guidance.active ? "yes" : "no");
 
         // Nav gain is edited in Parameters (Missile / Proportional Navigation),
-        // where the saver persists it and intercept_batch can sweep it.
+        // where the saver persists it and bvr_batch can sweep it.
 
         // The guidance phase, read-only: for a MIDCOURSE_ARH shot, whether it still
         // depends on the launcher's track or is autonomous.

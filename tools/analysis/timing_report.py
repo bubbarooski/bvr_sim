@@ -7,14 +7,14 @@ two sweeps are then checked to give identical per-seed results. The
 report states each figure with the machine it was measured on, then the PDF
 is rebuilt.
 
-    cmake --build build --config Release --target intercept_batch
+    cmake --build build --config Release --target bvr_batch
     python tools/analysis/timing_report.py                # ~20 min, mostly the 1-thread sweep
     python tools/analysis/timing_report.py --runs 50 --no-pdf   # quick check of the script
 
 The scenario is a frozen benchmark input, not a teaching scenario: keep it
 unchanged so figures from different dates stay like for like.
 
-Requires a Release build of intercept_batch (see experiments/_framework.py,
+Requires a Release build of bvr_batch (see experiments/_framework.py,
 whose run_batch this uses) and, for the PDF, what build_reference_pdf.py
 requires.
 """
@@ -140,7 +140,7 @@ def build_report(m, single, timeline, resolution_s, sweep, n_runs, same, out):
       "engagement is flown once by itself, then "
       f"{n_runs} times as a Monte Carlo sweep, and the measurement is wall-clock seconds.")
     w("")
-    w("All runs use the headless `intercept_batch` driver (no window, no "
+    w("All runs use the headless `bvr_batch` driver (no window, no "
       "rendering), back to back. Simulated time advances at a fixed 120 Hz "
       "regardless of wall clock.")
     w("")
@@ -245,7 +245,7 @@ def build_report(m, single, timeline, resolution_s, sweep, n_runs, same, out):
     w(f"| {n_runs} runs, 1 thread | {fmt_duration(s1)} |")
     w(f"| {n_runs} runs, {threads} threads | {fmt_duration(sn)} |")
     w("")
-    w("*Method: `intercept_batch --spec <spec.json> --out <results.csv>`, "
+    w("*Method: `bvr_batch --spec <spec.json> --out <results.csv>`, "
       f"`--jobs 1` and `--jobs {threads}`, via "
       "`python tools/analysis/timing_report.py`. Same Release binary throughout.*")
     w("")

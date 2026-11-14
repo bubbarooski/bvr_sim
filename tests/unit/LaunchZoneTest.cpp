@@ -162,7 +162,7 @@ TEST(LaunchZone, MultilinearInsideAndClampedOutside) {
 
 TEST(LaunchZone, LoadsAndRejectsMalformedTables) {
     {
-        ScratchFile file("intercept_sim_lz_ok.json", ZoneJson());
+        ScratchFile file("bvr_sim_lz_ok.json", ZoneJson());
         LaunchZone zone = LaunchZone::Load(file.Path());
         EXPECT_EQ(zone.RmaxNmi().size(), 32u);
         // Last axis fastest: index 1 is off-boresight 60 at every other axis's low end.
@@ -174,21 +174,21 @@ TEST(LaunchZone, LoadsAndRejectsMalformedTables) {
                                    ZoneJson("[0, 180]", "1, 2, 3"),       // too few values
                                    ZoneJson("[0]"),                       // an axis of one value
                                    std::string("{ not json")}) {
-        ScratchFile file("intercept_sim_lz_bad.json", bad);
+        ScratchFile file("bvr_sim_lz_bad.json", bad);
         EXPECT_THROW(LaunchZone::Load(file.Path()), std::runtime_error) << bad;
     }
     {
         std::string values = "-1";
         for (int i = 1; i < 32; ++i) values += ", 1";
-        ScratchFile file("intercept_sim_lz_neg.json", ZoneJson("[0, 180]", values));
+        ScratchFile file("bvr_sim_lz_neg.json", ZoneJson("[0, 180]", values));
         EXPECT_THROW(LaunchZone::Load(file.Path()), std::runtime_error);
     }
 }
 
 TEST(LaunchZone, FileHashIgnoresLineEndingsOnly) {
-    ScratchFile lf("intercept_sim_hash_lf.json", "{\n  \"a\": 1\n}\n");
-    ScratchFile crlf("intercept_sim_hash_crlf.json", "{\r\n  \"a\": 1\r\n}\r\n");
-    ScratchFile other("intercept_sim_hash_other.json", "{\n  \"a\": 2\n}\n");
+    ScratchFile lf("bvr_sim_hash_lf.json", "{\n  \"a\": 1\n}\n");
+    ScratchFile crlf("bvr_sim_hash_crlf.json", "{\r\n  \"a\": 1\r\n}\r\n");
+    ScratchFile other("bvr_sim_hash_other.json", "{\n  \"a\": 2\n}\n");
     EXPECT_EQ(LaunchZone::FileHash(lf.Path()), LaunchZone::FileHash(crlf.Path()));
     EXPECT_NE(LaunchZone::FileHash(lf.Path()), LaunchZone::FileHash(other.Path()));
     EXPECT_EQ(LaunchZone::FileHash(lf.Path()).size(), 16u);

@@ -85,7 +85,7 @@ class BuildFolder(Patched):
         lib = clean.BUILD / "lib"
         lib.mkdir(parents=True)
         (lib / "libgtest.a").write_text("x")
-        self.assertEqual(clean.stale_outputs(clean.BUILD, {"intercept_batch"}), [])
+        self.assertEqual(clean.stale_outputs(clean.BUILD, {"bvr_batch"}), [])
 
 
 if __name__ == "__main__":

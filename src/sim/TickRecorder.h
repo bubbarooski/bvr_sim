@@ -13,7 +13,7 @@ struct SimContext;
 // Static per-type data (radar power, motor impulse...) is left out -- it is
 // in the type files. Columns are listed in docs/SCHEMA.md, "Tick recording".
 //
-// Shared by the GUI's Record button and intercept_batch --record, so the two
+// Shared by the GUI's Record button and bvr_batch --record, so the two
 // files have the same columns.
 class TickRecorder {
 public:

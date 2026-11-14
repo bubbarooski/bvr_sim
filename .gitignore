@@ -7,9 +7,9 @@ out/
 /.claude/
 
 # Generated PDFs (rebuild: python tools/analysis/build_reference_pdf.py)
-docs/intercept_sim_reference.pdf
-docs/intercept_sim_validation.pdf
-docs/intercept_sim_reference.html
+docs/bvr_sim_reference.pdf
+docs/bvr_sim_validation.pdf
+docs/bvr_sim_reference.html
 docs/timing_report.pdf
 
 # Monte Carlo output: specs, results CSVs, and recorded trajectories.

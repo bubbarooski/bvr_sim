@@ -3,7 +3,7 @@
 Runs both test binaries (Debug: optimised code misattributes lines) under
 OpenCppCoverage, merges them, writes an HTML report and prints line
 coverage per source folder for the core. Child processes are covered too:
-the batch CLI test runs the built intercept_batch.
+the batch CLI test runs the built bvr_batch.
 
     cmake --build build --config Debug --target unit_tests validation_tests
     python tools/analysis/coverage.py              # summary + build/coverage/html

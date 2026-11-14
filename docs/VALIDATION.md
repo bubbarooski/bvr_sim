@@ -1,13 +1,13 @@
 # How Accurate Is This Simulator?
 
-**An accuracy assessment of `intercept_sim`, measured against published
+**An accuracy assessment of `bvr_sim`, measured against published
 performance data for the real aircraft, missile, and sensors it models.**
 
 ---
 
 ## What is being assessed
 
-`intercept_sim` simulates a beyond-visual-range air engagement: an F-16
+`bvr_sim` simulates a beyond-visual-range air engagement: an F-16
 flying under a six-degree-of-freedom flight model, an AIM-120-class
 missile guided by proportional navigation, pulse-Doppler radar, a
 launcher-to-missile datalink, and probabilistic lethality.

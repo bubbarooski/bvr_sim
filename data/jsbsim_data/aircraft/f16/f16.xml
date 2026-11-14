@@ -279,7 +279,7 @@
   <channel name="Flaps">
 
    <!--
-     - intercept_sim: the stock model drooped the flaperons 20 deg below
+     - bvr_sim: the stock model drooped the flaperons 20 deg below
      - 250 KCAS in any configuration, which put 20 deg of flap on a clean
      - aircraft cruising at 35 000 ft and 420 KTAS and made its drag
      - 50% too high there. The F-16C's trailing edge flaps are controlled
@@ -448,7 +448,7 @@
    </summer>
 
    <!--
-     - intercept_sim: the symmetric flaperon deflection, which drives the
+     - bvr_sim: the symmetric flaperon deflection, which drives the
      - flap lift and drag (CLDflaps, CDDflaps), is the trailing-edge-flap
      - schedule: tef-control is normalized so 1 = 0.349 rad (20 deg, the
      - F-16's flaperon flap limit). The stock model summed left + right
@@ -485,7 +485,7 @@
 
   <channel name="Pitch">
    <!--
-     - intercept_sim: this channel replaces the stock model's pitch-rate
+     - bvr_sim: this channel replaces the stock model's pitch-rate
      - demand, which held ~12 deg AoA at full aft stick (under 4 G at
      - 300 kt) and whose PID integrator never ran. Like the real F-16
      - FLCS it is a load-factor command with an angle-of-attack limiter.
@@ -1071,7 +1071,7 @@
   <channel name="Leading Edge Flap">
 
    <!--
-     - intercept_sim: the stock model stepped the leading edge flap to 15 deg
+     - bvr_sim: the stock model stepped the leading edge flap to 15 deg
      - above 5 deg AoA and 25 deg above 15 deg whatever the Mach, which held
      - 15 deg of flap on an aircraft cruising at Mach 0.9 and 5 deg AoA. The
      - F-16's LEF is scheduled with AoA, Mach and altitude (T.O. GR1F-16CJ-1-1,
@@ -1239,7 +1239,7 @@
  <aerodynamics>
 
   <!--
-    - intercept_sim: Mach dependence of the alpha-dependent lift (CLDh,
+    - bvr_sim: Mach dependence of the alpha-dependent lift (CLDh,
     - CLDlef). The lift tables are NASA TP-1538 low-speed wind-tunnel data,
     - so on their own every Mach has the same lift-curve slope (0.0645 per
     - deg for the whole aircraft, identified by tools/drivers/fcs_identify.cpp).
@@ -1367,7 +1367,7 @@
     </product>
    </function>
    <!--
-     - intercept_sim: compressibility drag refitted to measured F-16C
+     - bvr_sim: compressibility drag refitted to measured F-16C
      - minimum drag. The stock four-point table (+0.023 at M1.1 falling to
      - +0.015 at M1.8) left supersonic drag 25-30% below the data. Each row
      - is (measured clean CD0) - 0.021, the base table's own value at zero
@@ -1389,7 +1389,7 @@
      - extrapolate). See docs/VALIDATION.md, top speed.
      -->
    <!--
-     - intercept_sim: compressibility drag due to lift. The drag tables
+     - bvr_sim: compressibility drag due to lift. The drag tables
      - are tabulated on alpha from low-speed data, so they carry no
      - transonic growth of drag due to lift. Measured as the flight data
      - defines it (dCD/dCL^2 between trimmed 1 g and 3 g pull-ups, CL
@@ -1500,7 +1500,7 @@
     </product>
    </function>
    <!--
-     - intercept_sim: on the deflection's magnitude. Flap drag grows with
+     - bvr_sim: on the deflection's magnitude. Flap drag grows with
      - deflection either way; the stock signed product made the -2 deg
      - (trailing edge up) supersonic schedule subtract drag once the
      - flaperon mix carried the schedule at all.
@@ -2073,7 +2073,7 @@
     </product>
    </function>
    <!--
-     - intercept_sim: supersonic rows added. The stock table stopped at
+     - bvr_sim: supersonic rows added. The stock table stopped at
      - M1.2 and held -0.79 beyond, which with the Mach-dependent lift
      - (kCLmach) left the static margin at ~19% MAC at M1.6, against a
      - measured 25.7% for the F-16C about its 0.35 MAC operational CG

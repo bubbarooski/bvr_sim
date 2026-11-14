@@ -1,4 +1,4 @@
-# intercept_sim — Scenario JSON Schema
+# bvr_sim — Scenario JSON Schema
 
 Every entity in every scenario is created through this pipeline; nothing
 is hardcoded in `src/app/main.cpp`. This document is the authoring reference: each
@@ -556,7 +556,7 @@ finite number, a write that fails) reports why and does not claim success.
 
 ## Tick recording
 
-The GUI's **Record** button (time panel) and `intercept_batch --record`
+The GUI's **Record** button (time panel) and `bvr_batch --record`
 write the same CSV: the state that changes during a run, sampled after
 every tick (the batch's `--record-decimation N` keeps every Nth). Static
 per-type data is not repeated; it is in the type files. The GUI writes to

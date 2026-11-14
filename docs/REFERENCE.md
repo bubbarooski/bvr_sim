@@ -1,4 +1,4 @@
-# intercept_sim
+# bvr_sim
 
 ## A Modeling & Simulation Reference
 
@@ -7,7 +7,7 @@ simulator*
 
 ---
 
-`intercept_sim` is a single-process C++ air-engagement simulator: aircraft
+`bvr_sim` is a single-process C++ air-engagement simulator: aircraft
 flown by a six-degree-of-freedom flight dynamics model, a
 proportional-navigation missile, radar and radar-warning sensors, and
 a launcher-to-missile datalink — all driven from declarative scenario files,
@@ -3697,7 +3697,7 @@ produce identical draws, checked at startup.
 
 **Across optimization levels: same verdict, not the same bits.** The
 19 teaching scenarios at 20 seeds each (380 runs) were run through
-`intercept_batch` in both Debug and Release and every outcome field
+`bvr_batch` in both Debug and Release and every outcome field
 compared. Every run reached the same verdict (hit or miss). Most differ
 in the last digits (miss distance by at most 4·10⁻¹⁰ m), because the
 optimizer evaluates some floating-point expressions differently, and a

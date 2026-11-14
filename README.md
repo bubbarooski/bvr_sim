@@ -1,6 +1,6 @@
-# intercept_sim
+# bvr_sim
 
-[![CI](https://github.com/bubbarooski/intercept_sim/actions/workflows/ci.yml/badge.svg)](https://github.com/bubbarooski/intercept_sim/actions/workflows/ci.yml)
+[![CI](https://github.com/bubbarooski/bvr_sim/actions/workflows/ci.yml/badge.svg)](https://github.com/bubbarooski/bvr_sim/actions/workflows/ci.yml)
 
 A beyond-visual-range (BVR) air-combat simulator for learning how a radar
 shot actually works, for practicing modeling and simulation, and for
@@ -10,7 +10,7 @@ datalink, radar detection and tracking, and a radar warning receiver, all
 spawned from JSON scenario files, watched live in a 3D viewer, and run by
 the thousand headlessly.
 
-![intercept_sim mid-engagement: aircraft, radar cones, and a missile with its trail](docs/images/hero.png)
+![bvr_sim mid-engagement: aircraft, radar cones, and a missile with its trail](docs/images/hero.png)
 
 ## What it is for
 
@@ -64,7 +64,7 @@ Clone with submodules. `deps/jsbsim`, `deps/glfw`, `deps/imgui`,
 `deps/json` are vendored in the repo.
 
 ```
-git clone --recurse-submodules https://github.com/bubbarooski/intercept_sim.git
+git clone --recurse-submodules https://github.com/bubbarooski/bvr_sim.git
 ```
 
 Requires CMake 3.25+ (4.2+ for the Visual Studio 2026 generator) and a C++17 compiler.
@@ -88,7 +88,7 @@ cmake --build build --config Release   # headless batch + Monte Carlo
 Any recent Visual Studio works — swap the `-G` for your installed version
 (e.g. `"Visual Studio 17 2022"`), or drop `-G` entirely to let CMake pick.
 Binaries land in `build/Debug/` or `build/Release/`: the app
-(`intercept_sim`, `intercept_batch`) at the top, the test binaries in
+(`bvr_sim`, `bvr_batch`) at the top, the test binaries in
 `tests/`, and the measurement and model-fitting tools in `tools/`.
 
 ### Linux / macOS
@@ -130,8 +130,8 @@ directory**:
 
 ```
 cd build/Release
-./intercept_sim                                          # scenarios/1_core_01_first_shot.json
-./intercept_sim scenarios/1_core_08_notch.json
+./bvr_sim                                          # scenarios/1_core_01_first_shot.json
+./bvr_sim scenarios/1_core_08_notch.json
 ```
 
 The sim starts paused. Controls:
@@ -196,7 +196,7 @@ point, and [docs/SCHEMA.md](docs/SCHEMA.md) documents every key.
 ## Running a batch (Monte Carlo)
 
 A single run answers "what happened this time". A batch answers "how
-often". `intercept_batch` runs many variants of one scenario in parallel,
+often". `bvr_batch` runs many variants of one scenario in parallel,
 with no window. Run it from the **repo root** so `scenarios/` and
 `data/jsbsim_data/` resolve.
 
@@ -221,7 +221,7 @@ invokes the runner, and loads the results into pandas:
 
 ```
 pip install -r requirements.txt
-cmake --build build --config Release --target intercept_batch
+cmake --build build --config Release --target bvr_batch
 python experiments/_template.py
 ```
 
@@ -266,7 +266,7 @@ of `/seed` is refused). An aircraft's start altitude and heading are each
 written twice in a scenario; overriding either key moves the aircraft. Then:
 
 ```
-./build/Release/intercept_batch --spec spec.json --out results.csv [--jobs N] [--record traj_dir]
+./build/Release/bvr_batch --spec spec.json --out results.csv [--jobs N] [--record traj_dir]
 ```
 
 This writes `results.csv` (one row per run: launch, detection, hit/miss,
@@ -291,8 +291,8 @@ ctest --test-dir build -C Release --output-on-failure
 | Target | Covers |
 | --- | --- |
 | `unit_tests` | Pure logic: atmosphere, drag tables, vector/matrix math, camera projection and picking, intercept scoring, track table, parameter registry, event log |
-| `validation_tests` | Whole-pipeline checks: missile integration vs exact kinematics, radar equation, PN guidance and missile propulsion/drag/mass/envelope, F-16 kinematic identities and stability, radar confirmation/notch/FOV gating, save/load round-trips and reset determinism, the `intercept_batch` command line (job-count determinism, CSV output, error handling), plus a sanity sweep over every teaching scenario |
-| `PythonTools` | `tests/python/`: the experiment framework's pointer helper and error handling, the `batch_compare` regression gate (`--identical` must not call different work identical), and `clean.py`'s deletion rules. Skips what needs pandas or a built `intercept_batch` |
+| `validation_tests` | Whole-pipeline checks: missile integration vs exact kinematics, radar equation, PN guidance and missile propulsion/drag/mass/envelope, F-16 kinematic identities and stability, radar confirmation/notch/FOV gating, save/load round-trips and reset determinism, the `bvr_batch` command line (job-count determinism, CSV output, error handling), plus a sanity sweep over every teaching scenario |
+| `PythonTools` | `tests/python/`: the experiment framework's pointer helper and error handling, the `batch_compare` regression gate (`--identical` must not call different work identical), and `clean.py`'s deletion rules. Skips what needs pandas or a built `bvr_batch` |
 
 `real_world_validation` and `perf_benchmark` also build. They are
 measurement tools rather than pass/fail tests, so CTest doesn't run them.

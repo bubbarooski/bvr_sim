@@ -1,4 +1,4 @@
-// intercept_batch is how every sweep and batch_compare gate runs, so it is
+// bvr_batch is how every sweep and batch_compare gate runs, so it is
 // checked here as a user runs it: the built executable, a spec file, and
 // the two CSVs it writes. The load-bearing guarantees are that `--jobs 1`
 // and any other job count give identical results, that override columns
@@ -37,7 +37,7 @@ struct BatchResult {
 
 // A fresh, empty directory per test under GoogleTest's temp dir.
 fs::path FreshDir(const std::string& name) {
-    fs::path dir = fs::path(testing::TempDir()) / ("intercept_batch_" + name);
+    fs::path dir = fs::path(testing::TempDir()) / ("bvr_batch_" + name);
     fs::remove_all(dir);
     fs::create_directories(dir);
     return dir;
@@ -45,7 +45,7 @@ fs::path FreshDir(const std::string& name) {
 
 BatchResult RunBatch(const std::string& args, const fs::path& dir) {
     fs::path log = dir / "stdout.txt";
-    std::string command = "\"" + std::string(INTERCEPT_BATCH_EXE) + "\" " + args + " > \"" + log.string() + "\" 2>&1";
+    std::string command = "\"" + std::string(BVR_BATCH_EXE) + "\" " + args + " > \"" + log.string() + "\" 2>&1";
 #ifdef _WIN32
     // cmd /c strips the first and last quote of a line that starts with
     // one; an outer pair keeps the exe's own quotes intact.
@@ -384,7 +384,7 @@ TEST(BatchCli, BadArgumentsPrintUsageAndExitTwo) {
     for (const std::string& args : bad) {
         BatchResult result = RunBatch(args, dir);
         EXPECT_EQ(result.exitCode, 2) << args;
-        EXPECT_NE(result.output.find("usage: intercept_batch"), std::string::npos) << args;
+        EXPECT_NE(result.output.find("usage: bvr_batch"), std::string::npos) << args;
     }
 }
 

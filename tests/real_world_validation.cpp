@@ -1374,7 +1374,7 @@ int main() {
     JSBSim::FGJSBBase::debug_lvl = 0;  // its per-model banner would swamp the report
 
     std::printf("=================================================================\n");
-    std::printf(" intercept_sim -- external validation against published data\n");
+    std::printf(" bvr_sim -- external validation against published data\n");
     std::printf(" columns: simulated | published | error\n");
     std::printf(" source provenance (primary vs secondary) in docs/VALIDATION.md\n");
     std::printf("=================================================================\n");

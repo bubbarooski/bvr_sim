@@ -10,7 +10,7 @@
 // The C++ mirror of docs/SCHEMA.md: one entry per tunable scenario field,
 // keyed by the same JSON Pointer the batch runner already accepts. One entry
 // drives the GUI editor and the scenario saver and matches what
-// `intercept_batch` overrides with no translation -- so a tunable has a
+// `bvr_batch` overrides with no translation -- so a tunable has a
 // single representation rather than separate loader/widget/pointer copies to
 // keep in sync.
 //

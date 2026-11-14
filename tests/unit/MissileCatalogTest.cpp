@@ -28,7 +28,7 @@ class ScratchCatalog {
 public:
     explicit ScratchCatalog(const std::string& typeJson)
         : root_(std::filesystem::temp_directory_path() /
-                ("intercept_sim_missile_catalog_test_" + std::string(testing::UnitTest::GetInstance()->current_test_info()->name()))) {
+                ("bvr_sim_missile_catalog_test_" + std::string(testing::UnitTest::GetInstance()->current_test_info()->name()))) {
         std::filesystem::remove_all(root_);
         std::filesystem::create_directories(root_ / "test_type");
         std::ofstream(root_ / "test_type" / "missile.json") << typeJson;
@@ -297,7 +297,7 @@ TEST(MissileCatalog, AnUnknownKeyIsRefusedInEveryBlockTheLoaderReads) {
 TEST(MissileCatalog, EditedTypeFileMarksTheLaunchZoneStale) {
     namespace fs = std::filesystem;
     const fs::path real = "data/missiles/aim120";
-    const fs::path root = fs::temp_directory_path() / "intercept_sim_missile_stale_test";
+    const fs::path root = fs::temp_directory_path() / "bvr_sim_missile_stale_test";
     auto load = [&](bool edit) {
         fs::remove_all(root);
         fs::create_directories(root / "test_type" / "fit");

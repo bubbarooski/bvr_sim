@@ -10,7 +10,7 @@
     augmented?      yes
     injected?       no
 
-  intercept_sim: the Mil/AugThrust tables are FITTED to the F-16C flight
+  bvr_sim: the Mil/AugThrust tables are FITTED to the F-16C flight
   manual, T.O. GR1F-16CJ-1-1 (Hellenic AF, 2003) Appendix A, F100-PW-229,
   "data basis flight test": its MIL and MAX AB level-acceleration tables
   at drag index 0, sea level-30 000 ft (MIL) and -40 000 ft (MAX AB). With

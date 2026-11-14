@@ -66,7 +66,7 @@ ViewSettings& Get() { return gSettings; }
 
 void RegisterIniHandler() {
     ImGuiSettingsHandler handler;
-    handler.TypeName = "InterceptSim";
+    handler.TypeName = "BvrSim";
     handler.TypeHash = ImHashStr(handler.TypeName);
     handler.ReadOpenFn = ReadOpen;
     handler.ReadLineFn = ReadLine;

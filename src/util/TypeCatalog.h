@@ -13,7 +13,7 @@
 // A directory of type files, one subdirectory per type: <root>/<id>/<file>.
 // A type is parsed the first time something asks for it and then shared --
 // every entity of the type holds the same immutable T. Thread-safe, because
-// intercept_batch loads scenarios on several worker threads at once.
+// bvr_batch loads scenarios on several worker threads at once.
 //
 // What a type file contains is the parser's business, so the JSON stays in
 // the catalog's own .cpp and including this header does not pull json.hpp

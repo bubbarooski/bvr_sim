@@ -535,7 +535,7 @@ int main(int argc, char** argv) {
     // A multisampled framebuffer, for RenderSystem's GL_MULTISAMPLE.
     glfwWindowHint(GLFW_SAMPLES, kMsaaSamples);
 
-    GLFWwindow* window = glfwCreateWindow(kInitialWindowWidth, kInitialWindowHeight, "intercept_sim", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(kInitialWindowWidth, kInitialWindowHeight, "bvr_sim", nullptr, nullptr);
     if (!window) {
         std::fprintf(stderr, "Failed to create GLFW window\n");
         glfwTerminate();

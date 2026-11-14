@@ -35,7 +35,7 @@ namespace ViewSettingsStore {
 
 ViewSettings& Get();
 
-// Adds the [InterceptSim][Settings] section to imgui.ini. Call after
+// Adds the [BvrSim][Settings] section to imgui.ini. Call after
 // ImGui::CreateContext() and before the first NewFrame(), which reads it.
 void RegisterIniHandler();
 

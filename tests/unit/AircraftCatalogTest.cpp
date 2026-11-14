@@ -29,7 +29,7 @@ class ScratchCatalog {
 public:
     explicit ScratchCatalog(const std::string& typeJson)
         : root_(std::filesystem::temp_directory_path() /
-                ("intercept_sim_catalog_test_" + std::string(testing::UnitTest::GetInstance()->current_test_info()->name()))) {
+                ("bvr_sim_catalog_test_" + std::string(testing::UnitTest::GetInstance()->current_test_info()->name()))) {
         std::filesystem::remove_all(root_);
         std::filesystem::create_directories(root_ / "test_type");
         std::ofstream(root_ / "test_type" / "aircraft.json") << typeJson;
