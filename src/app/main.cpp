@@ -42,6 +42,7 @@
 #include "sim/SimClock.h"
 #include "sim/SimContext.h"
 #include "sim/SimLoop.h"
+#include "sim/TickRecorder.h"
 #include "systems/LaunchSystem.h"
 #include "systems/WaypointSystem.h"
 #include "util/EntityLookup.h"
@@ -563,6 +564,9 @@ int main(int argc, char** argv) {
     const std::string iniPath = (std::filesystem::absolute(argv[0]).parent_path() / "imgui.ini").string();
     ImGui::GetIO().IniFilename = iniPath.c_str();
     ViewSettingsStore::RegisterIniHandler();
+    // Recordings sit beside the executable too, out of the repo tree.
+    const std::string recordingDir = (std::filesystem::absolute(argv[0]).parent_path() / "recordings").string();
+    TickRecorder recorder;
     // Tab selects the next aircraft (Sidebar's shortcuts), not the next
     // text field.
     ImGui::GetCurrentContext()->ConfigNavEnableTabbing = false;
@@ -613,6 +617,7 @@ int main(int argc, char** argv) {
                 break;
             }
             SimLoop::Step(world, simContext, scenario, simClock.ConsumeStep(), simTime);
+            recorder.Sample(world, simContext, simTime);
         }
         StopOnGroundImpact(world, simClock, ui.groundImpactMessage);
 
@@ -646,7 +651,9 @@ int main(int argc, char** argv) {
                                    anchor.x,
                                    anchor.y,
                                    ui.centerOnSelectedEntity,
-                                   camera.distance};
+                                   camera.distance,
+                                   recorder,
+                                   recordingDir};
         Sidebar::Draw(world, simContext, sidebarState);
         ShowEventMarkTooltip(window, camera, viewNdcShiftX);
 

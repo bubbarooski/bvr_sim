@@ -155,8 +155,10 @@ The sim starts paused. Controls:
 
 ![The viewer: 3D scene, control panel, and the sidebar's Scenario, Parameters, Telemetry and Event Log](docs/images/gui-overview.png)
 
-The bottom panel holds pause, time scale, speed presets, Reset and
-Reload. The sidebar holds the scenario (its File popup has **New
+The bottom panel holds pause, time scale, speed presets, Reset,
+Reload and **Record**, which writes every tick's state (every entity and
+radar track) to a CSV in `recordings/` beside the executable
+([columns](docs/SCHEMA.md#tick-recording)). The sidebar holds the scenario (its File popup has **New
 Scenario** and **Save As**), the parameter editor, telemetry, the event
 log and the entity inspector; the gear at its top opens Settings (what
 the 3D view draws, which panels show, cone opacity, and Advanced mode,
@@ -269,7 +271,10 @@ written twice in a scenario; overriding either key moves the aircraft. Then:
 
 This writes `results.csv` (one row per run: launch, detection, hit/miss,
 miss distance, ...) and `results_events.csv` (one row per event, joinable
-on `run_id`). Run with no arguments for the full option list. Rows are
+on `run_id`). `--record <dir>` adds a per-run CSV of every entity's and
+radar track's changing state (10 Hz by default; `--record-decimation 1`
+for every tick), the same columns the GUI's **Record** button writes —
+see [docs/SCHEMA.md](docs/SCHEMA.md#tick-recording). Run with no arguments for the full option list. Rows are
 written in run order, and `--jobs 1` gives the same results as any other
 job count: the two outputs match byte for byte except the `wall_ms`
 column.

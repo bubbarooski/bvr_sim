@@ -27,7 +27,6 @@
 #include <exception>
 #include <filesystem>
 #include <fstream>
-#include <iomanip>
 #include <mutex>
 #include <optional>
 #include <regex>
@@ -50,9 +49,6 @@
 #include "FGJSBBase.h"
 #include "input_output/FGXMLElement.h"
 
-#include "components/Tag.h"
-#include "components/Transform.h"
-#include "ecs/ComponentStore.h"
 #include "ecs/World.h"
 #include "scenario/ParamRegistry.h"
 #include "scenario/ScenarioLoader.h"
@@ -61,6 +57,7 @@
 #include "sim/Environment.h"
 #include "sim/SimContext.h"
 #include "sim/SimLoop.h"
+#include "sim/TickRecorder.h"
 #include "systems/LaunchSystem.h"
 #include "util/Units.h"
 
@@ -283,37 +280,6 @@ std::string CsvCell(const nlohmann::json& value) {
     return value.dump();
 }
 
-// One CSV per run, positions only. Deliberately not JSON: a trajectory is
-// a dense uniform table, and at 10 Hz over a 150s engagement this is
-// already the largest artifact a sweep produces.
-struct TrajectoryRecorder {
-    std::ofstream file;
-    bool enabled = false;
-
-    void Open(const std::string& dir, int runId) {
-        const std::string path = dir + "/run_" + std::to_string(runId) + ".csv";
-        file.open(path);
-        enabled = file.is_open();
-        if (!enabled) throw std::runtime_error("cannot write trajectory file " + path);
-        // The default six significant figures write 1052345.6 ft as
-        // 1.05235e+06, which is no longer a position.
-        file << std::setprecision(12);
-        file << "sim_time_s,entity,name,x_ft,y_ft,z_ft,roll_deg,pitch_deg,yaw_deg\n";
-    }
-
-    void Sample(World& world, double simTime) {
-        if (!enabled) return;
-        ComponentStore<Transform>& transforms = world.Components<Transform>();
-        ComponentStore<Tag>& tags = world.Components<Tag>();
-        for (auto& [entity, transform] : transforms) {
-            const Tag* tag = tags.TryGet(entity);
-            file << simTime << ',' << entity << ',' << (tag ? CsvEscape(tag->name) : "") << ',' << transform.pos.x() << ',' << transform.pos.y() << ','
-                 << transform.pos.z() << ',' << transform.euler.x() << ',' << transform.euler.y() << ','
-                 << transform.euler.z() << '\n';
-        }
-    }
-};
-
 // An aircraft's start altitude and heading are written twice, in its
 // transform and in its jsbsim block, and the loader insists the two agree.
 // An override of one is carried to the other (as the GUI's save does), so
@@ -352,16 +318,20 @@ nlohmann::json ExecuteRun(const RunSpec& run, const nlohmann::json& baseScenario
 
     LaunchSystem::InitFromTags(world, scenario);
 
-    TrajectoryRecorder recorder;
-    if (!options.recordDir.empty()) recorder.Open(options.recordDir, run.runId);
+    TickRecorder recorder;
+    if (!options.recordDir.empty()) {
+        std::string path = options.recordDir + "/run_" + std::to_string(run.runId) + ".csv";
+        std::string error;
+        if (!recorder.Open(path, error)) throw std::runtime_error(error);
+    }
 
     double simTime = 0.0;
     long long tick = 0;
-    recorder.Sample(world, simTime);
+    recorder.Sample(world, simContext, simTime);
     while (simTime < maxSimTime && !simContext.outcome.resolved) {
         SimLoop::Step(world, simContext, scenario, SimClock::kFixedDt, simTime);
         ++tick;
-        if (tick % options.recordDecimation == 0) recorder.Sample(world, simTime);
+        if (tick % options.recordDecimation == 0) recorder.Sample(world, simContext, simTime);
     }
 
     const EngagementOutcome& outcome = simContext.outcome;

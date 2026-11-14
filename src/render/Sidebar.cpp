@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstdarg>
 #include <cstdio>
+#include <ctime>
 #include <filesystem>
 #include <iterator>
 #include <optional>
@@ -31,6 +32,7 @@
 #include "scenario/ScenarioSaver.h"
 #include "sim/EventLog.h"
 #include "sim/SimLoop.h"
+#include "sim/TickRecorder.h"
 #include "systems/LaunchSystem.h"
 #include "systems/WaypointSystem.h"
 #include "util/EntityLookup.h"
@@ -168,6 +170,45 @@ constexpr float kSpeedPresets[] = {1.0f, 10.0f, 50.0f, 100.0f};
 void RestartRun(World& world, SimContext& simContext, SidebarState& state, bool fromFile);
 bool gShowShortcuts = false;
 
+// <recordingDir>/<scenario stem>_<local date>_<time>.csv, with a counter if
+// two recordings start within the same second (a quick Reset).
+std::string NewRecordingPath(const SidebarState& state) {
+    std::time_t now = std::time(nullptr);
+    std::tm local{};
+#ifdef _WIN32
+    localtime_s(&local, &now);
+#else
+    localtime_r(&now, &local);
+#endif
+    char stamp[32];
+    std::strftime(stamp, sizeof(stamp), "%Y%m%d_%H%M%S", &local);
+    std::string base = std::filesystem::path(state.scenarioPath).stem().string() + "_" + stamp;
+    std::filesystem::path path = std::filesystem::path(state.recordingDir) / (base + ".csv");
+    for (int n = 2; std::filesystem::exists(path); ++n) {
+        path = std::filesystem::path(state.recordingDir) / (base + "_" + std::to_string(n) + ".csv");
+    }
+    return path.string();
+}
+
+// Opens a new file and writes the current state as its first sample, so a
+// recording started at t=0 (or rolled over by a restart) includes the start.
+void StartRecording(World& world, SimContext& simContext, SidebarState& state) {
+    std::error_code ec;
+    std::filesystem::create_directories(state.recordingDir, ec);
+    std::string error;
+    if (!state.recorder.Open(NewRecordingPath(state), error)) {
+        ShowToast(("Recording failed: " + error).c_str());
+        return;
+    }
+    state.recorder.Sample(world, simContext, state.simTime);
+}
+
+void StopRecording(SidebarState& state) {
+    std::string path = state.recorder.Path();
+    state.recorder.Close();
+    ShowToast(("Recording saved to " + path).c_str());
+}
+
 void DrawTimeHud(World& world, SimContext& simContext, SidebarState& state) {
     if (!ViewSettingsStore::Get().showTimeHud) return;
     ImGuiIO& io = ImGui::GetIO();
@@ -235,6 +276,23 @@ void DrawTimeHud(World& world, SimContext& simContext, SidebarState& state) {
     ImGui::SameLine();
     if (ImGui::Button("Reload")) RestartRun(world, simContext, state, /*fromFile=*/true);
     if (ImGui::IsItemHovered()) ImGui::SetTooltip("Re-read the file, discarding edits, paused at t=0 (Shift+R)");
+    ImGui::SameLine();
+    bool recording = state.recorder.IsOpen();
+    if (recording) ImGui::PushStyleColor(ImGuiCol_Text, LatticeStyle::kAccentPrimary);
+    if (ImGui::Button(recording ? "Stop Rec" : "Record")) {
+        if (recording) StopRecording(state);
+        else StartRecording(world, simContext, state);
+    }
+    if (recording) ImGui::PopStyleColor();
+    if (ImGui::IsItemHovered()) {
+        if (recording) {
+            ImGui::SetTooltip("Recording every tick to\n%s\nClick to stop and close the file.",
+                              state.recorder.Path().c_str());
+        } else {
+            ImGui::SetTooltip("Write every tick's changing state (every entity and radar track) to a CSV\n"
+                              "in the recordings folder beside the app. Reset or Reload starts a new file.");
+        }
+    }
     ImGui::SameLine();
     if (ImGui::Button("?")) gShowShortcuts = !gShowShortcuts;
     if (ImGui::IsItemHovered()) ImGui::SetTooltip("Keyboard shortcuts (?)");
@@ -440,6 +498,9 @@ void ResetRunState(World& world, SimContext& simContext, SidebarState& state) {
         // world would name whatever now has that number.
         EntityInspector::ClearSelection();
     }
+
+    // A recording holds one run: a restart rolls it over to a new file.
+    if (state.recorder.IsOpen()) StartRecording(world, simContext, state);
 }
 
 // The Scenario section's Reload button: rebuilds everything from the file

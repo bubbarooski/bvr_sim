@@ -299,6 +299,7 @@ TEST(BatchCli, TrajectoryPositionsKeepTheirPrecision) {
     ASSERT_GT(trajectory.rows.size(), 2u);
     bool sawFractionalPosition = false;
     for (const auto& row : trajectory.rows) {
+        if (row.at("kind") == "track") continue;  // a track row has no position of its own
         const std::string& x = row.at("x_ft");
         EXPECT_EQ(x.find('e'), std::string::npos) << "x_ft in scientific notation: " << x;
         size_t point = x.find('.');
@@ -307,6 +308,32 @@ TEST(BatchCli, TrajectoryPositionsKeepTheirPrecision) {
         }
     }
     EXPECT_TRUE(sawFractionalPosition) << "no position of 1e5 ft or more kept three decimal places";
+}
+
+// Past launch (about 47 s with seed 1), a sample holds both aircraft, the
+// missile and the radar track, each with the state its kind carries.
+TEST(BatchCli, TickRecordingHasARowPerEntityAndTrack) {
+    fs::path dir = FreshDir("record_kinds");
+    nlohmann::json spec = {{"scenario", kScenario}, {"max_sim_time_s", 60.0}, {"runs", {{{"seed", 1}}}}};
+    fs::path record = dir / "trajectories";
+    ASSERT_EQ(RunBatch("--spec " + Quoted(WriteSpec(dir, spec)) + " --out " + Quoted(dir / "out.csv") +
+                           " --record " + Quoted(record) + " --record-decimation 120",
+                       dir)
+                  .exitCode,
+              0);
+    Csv recording = ReadCsv(record / "run_0.csv");
+    std::map<std::string, std::map<std::string, std::string>> lastOfKind;
+    for (const auto& row : recording.rows) lastOfKind[row.at("kind")] = row;
+    ASSERT_EQ(lastOfKind.count("aircraft"), 1u);
+    ASSERT_EQ(lastOfKind.count("missile"), 1u);
+    ASSERT_EQ(lastOfKind.count("track"), 1u);
+    EXPECT_FALSE(lastOfKind["aircraft"].at("alpha_deg").empty());
+    EXPECT_TRUE(lastOfKind["aircraft"].at("mass_slug").empty());
+    EXPECT_EQ(lastOfKind["missile"].at("launched"), "1");
+    EXPECT_FALSE(lastOfKind["missile"].at("range_to_target_ft").empty());
+    EXPECT_EQ(lastOfKind["track"].at("track_state"), "CONFIRMED");
+    EXPECT_FALSE(lastOfKind["track"].at("est_error_ft").empty());
+    EXPECT_TRUE(lastOfKind["track"].at("x_ft").empty());
 }
 
 TEST(BatchCli, ARecordDirectoryThatCannotBeCreatedFailsBeforeAnyRun) {

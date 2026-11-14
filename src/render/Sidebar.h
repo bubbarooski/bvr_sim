@@ -8,6 +8,8 @@
 #include "sim/SimClock.h"
 #include "sim/SimContext.h"
 
+class TickRecorder;
+
 // The app/session state the sidebar reads and writes each frame, as
 // references into what main.cpp owns.
 struct SidebarState {
@@ -33,6 +35,10 @@ struct SidebarState {
 
     // For the grid scale legend (RenderSystem::GridSpacingFt).
     float cameraDistance;
+    // The time panel's Record toggle opens and closes it; main.cpp samples
+    // it after every tick. Files go in recordingDir.
+    TickRecorder& recorder;
+    const std::string& recordingDir;
 };
 
 // Fixed-width, right-docked control panel. Called once per frame, after

@@ -136,6 +136,7 @@ add_library(intercept_core STATIC
     src/sim/RadarEquation.cpp
     src/sim/RadarTrackFilter.cpp
     src/sim/SimLoop.cpp
+    src/sim/TickRecorder.cpp
     src/systems/AirborneRadarSystem.cpp
     src/systems/ControlSystem.cpp
     src/systems/DatalinkSystem.cpp

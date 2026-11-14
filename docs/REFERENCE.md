@@ -324,6 +324,12 @@ each swept parameter as its own column; and a long one, one row per
 event, keyed on the run identifier. Splitting them keeps the wide table
 a clean rectangle — one run, one row — while preserving the event detail
 the typed columns do not carry, such as the reason a seeker lost lock.
+A run can also be recorded tick by tick: every entity's and radar track's
+changing state (position, attitude, flight condition, autopilot and
+guidance state, the track and datalink estimates and their true error), in
+one long table. The interactive viewer writes the same file, so a run
+watched live can be analysed with the same tools as a batch run. The
+columns are listed in [SCHEMA.md](SCHEMA.md#tick-recording).
 
 A representative cost, measured on a 12-thread desktop: 500 runs of a
 full head-on BVR engagement complete in 49 s, about 0.10 s of wall time

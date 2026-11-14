@@ -551,3 +551,57 @@ re-serialised, so keys are written in alphabetical order with a 4-space
 indent: the values are the source's, but a hand-ordered file will show a
 layout diff. A save that cannot be completed (a live value that is not a
 finite number, a write that fails) reports why and does not claim success.
+
+---
+
+## Tick recording
+
+The GUI's **Record** button (time panel) and `intercept_batch --record`
+write the same CSV: the state that changes during a run, sampled after
+every tick (the batch's `--record-decimation N` keeps every Nth). Static
+per-type data is not repeated; it is in the type files. The GUI writes to
+`recordings/<scenario>_<date>_<time>.csv` beside the executable, and a
+Reset or Reload starts a new file. The batch writes `<dir>/run_<id>.csv`.
+
+The file is long format: one row per entity with a transform, then one row
+per radar track, per sample. `kind` says which a row is, and a cell that
+does not apply to a row's kind is empty. Booleans are `0`/`1`. Positions
+are in the world frame (x east, y up, z north), in feet.
+
+| Column | Rows | Unit | Meaning |
+|---|---|---|---|
+| `sim_time_s` | all | s | Sim time the state refers to. |
+| `kind` | all | | `aircraft`, `missile`, `track` (or `other` for a bare velocity entity). |
+| `entity`, `name` | all | | The entity (for a track, the radar's owner) and its tag. |
+| `target` | missile, track | | The missile's target; the tracked entity. |
+| `destroyed` | entity | | Marked destroyed (a hit, structural failure or the ground). |
+| `x_ft`, `y_ft`, `z_ft` | entity | ft | Position. |
+| `roll_deg`, `pitch_deg`, `yaw_deg` | entity | deg | Attitude. |
+| `vx_fps`, `vy_fps`, `vz_fps`, `speed_fps` | entity | ft/s | Velocity over the ground and its magnitude. |
+| `mach` | aircraft, missile | | Mach on the velocity through the air. |
+| `kcas`, `alpha_deg`, `beta_deg`, `qbar_psf` | aircraft | kt, deg, deg, lbf/ft² | JSBSim calibrated airspeed, angle of attack, sideslip, dynamic pressure. |
+| `nz_g`, `nx_g`, `ny_g` | aircraft | g | Body load factors (JSBSim `accelerations/N*`). |
+| `p_deg_s`, `q_deg_s` | aircraft | deg/s | Roll and pitch rate. |
+| `weight_lbf`, `fuel_lbf` | aircraft | lbf | Gross weight and fuel on board. |
+| `thrust_lbf` | aircraft, missile | lbf | Engine thrust; the missile motor's thrust for its phase (boost, sustain, 0 after burnout). |
+| `aileron_cmd`, `elevator_cmd`, `throttle_cmd` | aircraft | normalised | The autopilot's stick and throttle. |
+| `ap_heading_deg`, `ap_altitude_ft`, `ap_speed_kts` | aircraft | | The autopilot's live setpoints. |
+| `overstress_damage` | aircraft | | Accumulated structural damage (failure at 1). |
+| `waypoints_left` | entity with a route | | Points still queued. |
+| `radar_stt_target` | aircraft | | The entity the radar holds in single-target track; empty while scanning. |
+| `rwr_mode`, `rwr_illuminated`, `rwr_missile_warning` | aircraft | | RWR perceived mode (`NONE`/`SEARCH`/`LOCK`) and warnings. |
+| `ax_fps2`, `ay_fps2`, `az_fps2` | missile | ft/s² | Total acceleration (thrust, drag, gravity, guidance). |
+| `achieved_lateral_g` | missile | g | Guidance acceleration achieved after the response lag. |
+| `mass_slug` | missile | slug | Mass, propellant burning off over the motor's burn. |
+| `launched`, `guidance_active` | missile | | Fired; still guiding (0 once resolved). |
+| `seeker_mode`, `seeker_active`, `has_lock`, `time_since_lock_lost_s` | missile | | Seeker type, whether its own seeker is radiating, lock and memory-coast time. |
+| `launch_turn_done`, `lofting` | missile | | Launch-turn and loft state. |
+| `range_to_target_ft` | missile | ft | True range to the target. |
+| `track_state`, `frame_hits`, `missed_frames` | track | | `NONE`/`TENTATIVE`/`CONFIRMED`; hits in the M-of-N window; consecutive misses. |
+| `est_age_s` | missile, track | s | Age of the estimate: datalink staleness, or time since the radar last detected the target. |
+| `datalink_lost` | missile | | The launcher's track was lost, so the datalink stopped. |
+| `est_x_ft` … `est_vz_fps` | missile, track | ft, ft/s | Target estimate: the missile's datalinked belief, or the radar track's filtered state. |
+| `est_pos_sigma_ft` | track | ft | 1-sigma position uncertainty of the track filter (root of the covariance trace). |
+| `est_error_ft` | missile, track | ft | Distance from the estimate to the target's true position. |
+
+A 120-second engagement recorded every tick is about 18 MB.
