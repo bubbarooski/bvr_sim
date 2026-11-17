@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 # C is enabled for deps/gl3w/src/gl3w.c: without it that lone C source compiles
 # with cl.exe's default static CRT (/MT) instead of the /MD everything else
 # uses, and the mismatch warns (LNK4098) when it reaches bvr_sim.
-project(bvr_sim CXX C)
+project(bvr_sim VERSION 1.0.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
